@@ -97,7 +97,7 @@ python3 generate_samplesheet.py \
 	--samplesheet-version "v1"
 ```
 
-### Real world example: OUS legacy nextseq, artificial samples (incl AcroMetrix)
+### Real world example: OUS legacy next	seq, artificial samples (incl AcroMetrix)
 
 ```
 python3 generate_samplesheet.py \
