@@ -32,8 +32,7 @@ if (params.input) { ch_input = file(params.input) } else { exit 1, 'Input not sp
 
 // TODO: Add module and subworkflow imports here
 include { CUSTOM_DUMPSOFTWAREVERSIONS } from '../modules/nf-core/custom/dumpsoftwareversions/main'
-include { FASTQC                      } from '../modules/nf-core/fastqc/main'
-include { SAMPLESHEET_CHECK           } from '../modules/local/samplesheet_check'
+include { LOCAL_APP_PREPPER           } from '../modules/local/local_app_prepper'
 
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -41,21 +40,15 @@ include { SAMPLESHEET_CHECK           } from '../modules/local/samplesheet_check
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 */
 
-workflow START_PIPELINE {
+workflow MAIN {
 
     ch_versions = Channel.empty()
 
     // MODULE: Run Samplesheet_Check
-    SAMPLESHEET_CHECK ( 
+    LOCAL_APP_PREPPER ( 
         ch_input
     )
-    ch_versions = ch_versions.mix(SAMPLESHEET_CHECK.out.versions.first())
-
-    // MODULE: Run FastQC
-    FASTQC (
-        SAMPLESHEET_CHECK.out.csv.splitCsv( header:true, sep:',' ).map{ create_fastq_channel(it) }
-    )
-    ch_versions = ch_versions.mix(FASTQC.out.versions.first())
+    ch_versions = ch_versions.mix(LOCAL_APP_PREPPER.out.versions.first())
 
     CUSTOM_DUMPSOFTWAREVERSIONS (
         ch_versions.unique{ it.text }.collectFile(name: 'collated_versions.yml')
