@@ -19,7 +19,7 @@ process LOCAL_APP {
     samplesheet = samplesheet ? samplesheet : runfolder + "/SampleSheet.csv"
 
     """
-    sed 's|RUNFOLDER|'$runfolder'|g; s|SAMPLESHEETPATH|'$samplesheet'|g' $json > inputs.json
+    sed 's|RUNFOLDER|'`pwd`/$runfolder'|g; s|SAMPLESHEETPATH|'`pwd`/$samplesheet'|g' $json > inputs.json
     cat inputs.json
     echo "Starting Local App"
     java \\
