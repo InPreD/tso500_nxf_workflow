@@ -52,12 +52,12 @@ workflow MAIN {
     ch_versions = ch_versions.mix(LOCAL_APP_PREPPER.out.versions.first())
 
     // MODULE: Run LocalApp TSO500 workflow
-    LOCAL_APP_PREPPER ( 
+    LOCAL_APP ( 
         ch_input,
         Channel.empty(),
         LOCAL_APP_PREPPER.out.tso500
     )
-    ch_versions = ch_versions.mix(LOCAL_APP_PREPPER.out.versions.first())
+    ch_versions = ch_versions.mix(LOCAL_APP.out.versions.first())
 
     CUSTOM_DUMPSOFTWAREVERSIONS (
         ch_versions.unique{ it.text }.collectFile(name: 'collated_versions.yml')
