@@ -44,9 +44,17 @@ workflow MAIN {
 
     ch_versions = Channel.empty()
 
-    // MODULE: Run Samplesheet_Check
+    // MODULE: Prepare input.json for LocalApp
     LOCAL_APP_PREPPER ( 
         ch_input
+    )
+    ch_versions = ch_versions.mix(LOCAL_APP_PREPPER.out.versions.first())
+
+    // MODULE: Run LocalApp TSO500 workflow
+    LOCAL_APP_PREPPER ( 
+        ch_input,
+        Channel.empty(),
+        LOCAL_APP_PREPPER.out.tso500
     )
     ch_versions = ch_versions.mix(LOCAL_APP_PREPPER.out.versions.first())
 
