@@ -44,17 +44,18 @@ include { LOCAL_APP_PREPPER           } from '../modules/local/local_app_prepper
 workflow MAIN {
 
     ch_versions = Channel.empty()
+    samplesheet = []
 
     // MODULE: Prepare input.json for LocalApp
     LOCAL_APP_PREPPER ( 
         ch_input
     )
-    ch_versions = ch_versions.mix(LOCAL_APP_PREPPER.out.versions.first())
+    ch_versions = ch_versions.mix(LOCAL_APP_PREPPER.out.versions)
 
     // MODULE: Run LocalApp TSO500 workflow
     LOCAL_APP ( 
         ch_input,
-        Channel.empty(),
+        samplesheet,
         LOCAL_APP_PREPPER.out.tso500
     )
     ch_versions = ch_versions.mix(LOCAL_APP.out.versions.first())
