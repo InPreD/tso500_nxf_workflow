@@ -2,7 +2,8 @@ process LOCAL_APP {
     tag "$id"
     label 'process_high'
 
-    container "docker-oncology.dockerhub.illumina.com/acadia/acadia-500-wdl-workflow:ruo-2.2.0.12"
+    container 'docker-oncology.dockerhub.illumina.com/acadia/acadia-500-wdl-workflow:ruo-2.2.0.12'
+    containerOptions '--entrypoint /bin/bash'
 
     input:
     path runfolder
@@ -21,6 +22,7 @@ process LOCAL_APP {
     """
     sed 's|RUNFOLDER|'$runfolder'|g; s|SAMPLESHEET|'$samplesheet'|g' $json > inputs.json
     cat inputs.json
+    echo "Starting Local App"
     java \\
         -jar /opt/cromwell/cromwell-36.jar \\
             run \\
