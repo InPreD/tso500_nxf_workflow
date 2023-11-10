@@ -2,8 +2,7 @@ process LOCAL_APP {
     tag "$id"
     label 'process_high'
 
-    container 'docker-oncology.dockerhub.illumina.com/acadia/acadia-500-wdl-workflow:ruo-2.2.0.12'
-    containerOptions '--entrypoint /bin/bash'
+    container 'local/acadia/acadia-500-wdl-workflow:ruo-2.2.0.12'
 
     input:
     path runfolder
