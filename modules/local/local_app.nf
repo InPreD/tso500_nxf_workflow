@@ -3,12 +3,12 @@ process LOCAL_APP {
     label 'process_high'
 
     container 'local/acadia/acadia-500-wdl-workflow:ruo-2.2.0.12'
-    containerOptions '-v $(pwd)/${json}:/test/tso500.json'
 
     input:
     path runfolder
     path samplesheet
     path json
+    path resourcefolder
 
     output:
     path "versions.yml", emit: versions
@@ -20,8 +20,8 @@ process LOCAL_APP {
     samplesheet = samplesheet ? samplesheet : runfolder + "/SampleSheet.csv"
 
     """
-    sed 's|RUNFOLDER|'`pwd`/$runfolder'|g; s|SAMPLESHEETPATH|'`pwd`/$samplesheet'|g' $json > inputs.json
-    cat /test/tso500.json
+    sed 's|ANALYSISFOLDER|'`pwd`'|g; s|RESOURCEFOLDER|'`pwd`/$resourcefolder'|g; s|RUNFOLDER|'`pwd`/$runfolder'|g; s|SAMPLESHEETPATH|'`pwd`/$samplesheet'|g' $json > inputs.json
+    cat inputs.json
     java \\
         -jar /opt/cromwell/cromwell-36.jar \\
             run \\

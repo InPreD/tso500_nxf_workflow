@@ -13,6 +13,7 @@ for (param in checkPathParamList) { if (param) { file(param, checkIfExists: true
 
 // Check mandatory parameters
 if (params.input) { ch_input = file(params.input) } else { exit 1, 'Input not specified!' }
+if (params.tso500_resource_folder) { ch_tso500_resource_folder = file(params.tso500_resource_folder) } else { exit 1, 'TSO500 resource folder not specified!' }
 
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -56,7 +57,8 @@ workflow MAIN {
     LOCAL_APP ( 
         ch_input,
         samplesheet,
-        LOCAL_APP_PREPPER.out.tso500
+        LOCAL_APP_PREPPER.out.tso500,
+        ch_tso500_resource_folder
     )
     ch_versions = ch_versions.mix(LOCAL_APP.out.versions.first())
 
