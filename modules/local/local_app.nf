@@ -1,8 +1,10 @@
 process LOCAL_APP {
     tag "$id"
+    stageInMode 'copy'
     label 'process_high'
 
-    container 'local/acadia/acadia-500-wdl-workflow:ruo-2.2.0.12'
+    container 'docker-oncology.dockerhub.illumina.com/acadia/acadia-500-wdl-workflow:ruo-2.2.0.12'
+    containerOptions '--entrypoint=""'
 
     input:
     path runfolder
