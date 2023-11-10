@@ -32,6 +32,7 @@ if (params.input) { ch_input = file(params.input) } else { exit 1, 'Input not sp
 
 // TODO: Add module and subworkflow imports here
 include { CUSTOM_DUMPSOFTWAREVERSIONS } from '../modules/nf-core/custom/dumpsoftwareversions/main'
+include { LOCAL_APP                   } from '../modules/local/local_app'
 include { LOCAL_APP_PREPPER           } from '../modules/local/local_app_prepper'
 
 /*
