@@ -29,8 +29,8 @@ process LOCAL_APP {
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":
         cromwell: \$(java -jar /opt/cromwell/cromwell-36.jar --version | sed 's/cromwell //g')
-        java: \$(java -version 2>&1 | grep version | sed 's/^openjdk version "\|"$//g')
-        tso500: \$(grep "TSO500.workflowVersion" input.json | sed 's/.*"TSO500.workflowVersion": "\|"$//g)
+        java: \$(java -version 2>&1 | grep version | sed 's/^openjdk version "\\|"$//g')
+        tso500: \$(grep "TSO500.workflowVersion" input.json | sed 's/.*"TSO500.workflowVersion": "\\|"$//g)
     END_VERSIONS
     """
 }
