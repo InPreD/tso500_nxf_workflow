@@ -19,7 +19,8 @@ process LOCAL_APP {
     samplesheet = samplesheet ? samplesheet : runfolder + "/SampleSheet.csv"
 
     """
-    sed 's|RUNFOLDER|'$runfolder'|g; s|SAMPLESHEET|'$samplesheet'|g' $json > input.json
+    sed 's|RUNFOLDER|'$runfolder'|g; s|SAMPLESHEET|'$samplesheet'|g' $json > inputs.json
+    cat inputs.json
     java \\
         -jar /opt/cromwell/cromwell-36.jar \\
             run \\
