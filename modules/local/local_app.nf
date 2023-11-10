@@ -1,6 +1,5 @@
 process LOCAL_APP {
     tag "$id"
-    stageInMode 'copy'
     label 'process_high'
 
     container 'docker-oncology.dockerhub.illumina.com/acadia/acadia-500-wdl-workflow:ruo-2.2.0.12'
@@ -22,7 +21,7 @@ process LOCAL_APP {
     samplesheet = samplesheet ? samplesheet : runfolder + "/SampleSheet.csv"
 
     """
-    sed 's|ANALYSISFOLDER|'`pwd`'|g; s|RESOURCEFOLDER|'`pwd`/$resourcefolder'|g; s|RUNFOLDER|'`pwd`/$runfolder'|g; s|SAMPLESHEETPATH|'`pwd`/$samplesheet'|g' $json > inputs.json
+    sed 's|ANALYSISFOLDER|'`pwd`'|g; s|RESOURCEFOLDER|'`pwd`/$resourcefolder'|g; s|RUNFOLDER|\''`pwd`/$runfolder'\'|g; s|SAMPLESHEETPATH|'`pwd`/$samplesheet'|g' $json > inputs.json
     cat inputs.json
     java \\
         -jar /opt/cromwell/cromwell-36.jar \\
