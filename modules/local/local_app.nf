@@ -12,7 +12,11 @@ process LOCAL_APP {
     path resourcefolder
 
     output:
-    path "versions.yml", emit: versions
+    path "cromwell-executions"   , emit: cromwell-executions
+    path "cromwell-workflow-logs", emit: cromwell-workflow-logs
+    path "inputs.json"           , emit: json
+    path "Logs_Intermediates"    , emit: logs-intermediates
+    path "versions.yml"          , emit: versions
 
     when:
     task.ext.when == null || task.ext.when
@@ -22,7 +26,6 @@ process LOCAL_APP {
 
     """
     sed 's|ANALYSISFOLDER|'`pwd`'|g; s|RESOURCEFOLDER|'`pwd`/$resourcefolder'|g; s|RUNFOLDER|'`pwd`/$runfolder'|g; s|SAMPLESHEETPATH|'`pwd`/$samplesheet'|g' $json > inputs.json
-    cat inputs.json
     java \\
         -jar /opt/cromwell/cromwell-36.jar \\
             run \\
