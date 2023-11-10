@@ -18,7 +18,7 @@ process LOCAL_APP_PREPPER {
     script:
     """
     local_app_prepper.py \\
-        -i $run_folder
+        -i $runfolder
 
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":
