@@ -16,6 +16,7 @@ process LOCAL_APP {
     path "cromwell-workflow-logs", emit: cromwell-workflow-logs
     path "inputs.json"           , emit: json
     path "Logs_Intermediates"    , emit: logs-intermediates
+    path "Results"               , emit: results
     path "versions.yml"          , emit: versions
 
     when:
@@ -36,7 +37,7 @@ process LOCAL_APP {
     "${task.process}":
         cromwell: \$(java -jar /opt/cromwell/cromwell-36.jar --version | sed 's/cromwell //g')
         java: \$(java -version 2>&1 | grep version | sed 's/^openjdk version "\\|"\$//g')
-        tso500: \$(grep "TSO500.workflowVersion" input.json | sed 's/.*"TSO500.workflowVersion": "\\|"\$//g)
+        tso500: \$(grep "TSO500.workflowVersion" inputs.json | sed 's/.*"TSO500.workflowVersion": "\\|"\$//g')
     END_VERSIONS
     """
 }
