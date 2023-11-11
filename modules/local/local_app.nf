@@ -12,10 +12,10 @@ process LOCAL_APP {
     path resourcefolder
 
     output:
-    path "cromwell-executions"   , emit: cromwell-executions
-    path "cromwell-workflow-logs", emit: cromwell-workflow-logs
+    path "cromwell-executions"   , emit: cromwell_executions
+    path "cromwell-workflow-logs", emit: cromwell_workflow_logs
     path "inputs.json"           , emit: json
-    path "Logs_Intermediates"    , emit: logs-intermediates
+    path "Logs_Intermediates"    , emit: logs_intermediates
     path "Results"               , emit: results
     path "versions.yml"          , emit: versions
 
