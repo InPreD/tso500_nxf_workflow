@@ -1,6 +1,5 @@
 {
-  // TODO: Add project name
-  "name": "sfb/project_name",
+  "name": "InPreD/tso500_nxf_workflow",
   "repos": {
     "https://github.com/nf-core/modules.git": {
       "modules": {
