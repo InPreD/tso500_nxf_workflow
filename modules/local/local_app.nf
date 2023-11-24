@@ -6,7 +6,7 @@ process LOCAL_APP_DEMULTIPLEX {
     containerOptions '--entrypoint=""'
 
     input:
-    path val(id), path(runfolder), path(samplesheet), path(json)
+    tuple val(id), path(runfolder), path(samplesheet), path(json)
     path resourcefolder
 
     output:
