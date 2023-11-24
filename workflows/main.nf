@@ -70,7 +70,7 @@ workflow MAIN {
     // attach the json to the correct run folder information
     local_app_demultiplex_input = run_folders.join(LOCAL_APP_PREPPER.out.demultiplex)
     LOCAL_APP_PREPPER.out.tso500.view()
-    LOCAL_APP_PREPPER.out.tso500.gather()
+    LOCAL_APP_PREPPER.out.gather.view()
 
     // MODULE: Run LocalApp TSO500 workflow
     LOCAL_APP_DEMULTIPLEX (
