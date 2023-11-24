@@ -24,6 +24,13 @@
           "format": "directory-path",
           "description": "The output directory where the results will be saved. You have to use absolute paths to storage on Cloud infrastructure.",
           "fa_icon": "fas fa-folder-open"
+        },
+        "tso500_resource_folder": {
+          "type": "string",
+          "format": "directory-path",
+          "description": "Path to directory where all reference files, required by the TSO500 LocalApp, are stored.",
+          "help_text": "The resource directory is usually obtained together with the LocalApp image.",
+          "fa_icon": "fas fa-folder-open"
         }
       }
     },
