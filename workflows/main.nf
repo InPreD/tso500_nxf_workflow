@@ -70,7 +70,7 @@ workflow MAIN {
 
     // construct a channel for each sample
     local_app_tso500_input = run_folders
-        .join(LOCAL_APP_DEMULTIPLEX.logs_intermediates)
+        .join(LOCAL_APP_DEMULTIPLEX.out.logs_intermediates)
         .join(LOCAL_APP_PREPPER.out.tso500.transpose())
         .map{ construct_fastq_folder_path(it) }
         .view()
