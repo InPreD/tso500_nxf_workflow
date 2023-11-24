@@ -77,7 +77,7 @@ workflow MAIN {
         local_app_demultiplex_input,
         ch_tso500_resource_folder
     )
-    versions = versions.mix(LOCAL_APP.out.versions.first())
+    versions = versions.mix(LOCAL_APP_DEMULTIPLEX.out.versions.first())
 
     CUSTOM_DUMPSOFTWAREVERSIONS (
         versions.unique{ it.text }.collectFile(name: 'collated_versions.yml')
