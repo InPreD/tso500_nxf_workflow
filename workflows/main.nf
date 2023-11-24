@@ -1,3 +1,4 @@
+
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     VALIDATE INPUTS
@@ -12,7 +13,7 @@ def checkPathParamList = [ params.input ]
 for (param in checkPathParamList) { if (param) { file(param, checkIfExists: true) } }
 
 // Check mandatory parameters
-if (params.input) { ch_input = file(params.input) } else { exit 1, 'Input not specified!' }
+//if (params.input) { ch_input = file(params.input) } else { exit 1, 'Input not specified!' }
 if (params.tso500_resource_folder) { ch_tso500_resource_folder = file(params.tso500_resource_folder) } else { exit 1, 'TSO500 resource folder not specified!' }
 
 /*
@@ -31,10 +32,13 @@ if (params.tso500_resource_folder) { ch_tso500_resource_folder = file(params.tso
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 */
 
-// TODO: Add module and subworkflow imports here
 include { CUSTOM_DUMPSOFTWAREVERSIONS } from '../modules/nf-core/custom/dumpsoftwareversions/main'
 include { LOCAL_APP                   } from '../modules/local/local_app'
 include { LOCAL_APP_PREPPER           } from '../modules/local/local_app_prepper'
+
+include { validateParameters; paramsHelp; paramsSummaryLog; fromSamplesheet } from 'plugin/nf-validation'
+
+ch_input = Channel.fromSamplesheet("input")
 
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

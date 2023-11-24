@@ -6,22 +6,67 @@
   "items": {
     "type": "object",
     "properties": {
-      "sample": {
+      "dataset_id": {
         "type": "string",
         "pattern": "^\\S+$",
-        "errorMessage": "Sample name must be provided and cannot contain spaces"
+        "errorMessage": "Dataset id must be provided and cannot contain spaces"
       },
-      "fastq_1": {
+      "sample_id": {
         "type": "string",
-        "pattern": "^\\S+\\.f(ast)?q\\.gz$",
-        "errorMessage": "FastQ file for reads 1 must be provided, cannot contain spaces and must have extension '.fq.gz' or '.fastq.gz'"
+        "pattern": "^\\S+$",
+        "errorMessage": "Sample id must be provided and cannot contain spaces"
       },
-      "fastq_2": {
+      "molecule": {
         "type": "string",
-        "pattern": "^\\S+\\.f(ast)?q\\.gz$",
-        "errorMessage": "FastQ file for reads 2 must be provided, cannot contain spaces and must have extension '.fq.gz' or '.fastq.gz'"
+        "pattern": "^[d,D,r,R]([n,N][a,A])?$",
+        "errorMessage": "Molecule is either D(NA) or R(NA), case insensitive"
+      },
+      "sample_type": {
+        "type": "string",
+        "pattern": "^(([t,T]([u,U][m,M][o,O][r,R])?)|([n,N]([o,O][r,R][m,M][a,A][l,L])?))$",
+        "errorMessage": "Sample type must be either T(umor) or N(ormal), case insensitive"
+      },
+      "tumor_site": {
+        "type": "string",
+        "pattern": "^(\\d{1,2}|NA)$",
+        "errorMessage": "Tumor site should be number id or NA if sample is not tumor material"
+      },
+      "tumor_content": {
+        "type": "integer",
+        "errorMessage": "Tumor site should be number id or NA if sample is not tumor material",
+        "minimum": 0,
+        "maximum": 100
+      },
+      "run_id": {
+        "type": "string",
+        "pattern": "^\\S+$",
+        "errorMessage": "Run id must be provided and cannot contain spaces"
+      },
+      "path_to_run": {
+        "type": "string",
+        "errorMessage": "Path to run must be provided and exist",
+        "format": "directory-path",
+        "exists": true
+      },
+      "path_to_samplesheet": {
+        "type": "string",
+        "errorMessage": "Path to samplesheet",
+        "format": "file-path"
+      },
+      "barcode": {
+        "type": "string",
+        "errorMessage": "Run id must be provided and cannot contain spaces"
       }
     },
-    "required": ["sample", "fastq_1", "fastq_2"]
+    "required": [
+      "dataset_id",
+      "sample_id",
+      "molecule",
+      "sample_type",
+      "tumor_site",
+      "tumor_content",
+      "run_id",
+      "path_to_run"
+    ]
   }
 }
