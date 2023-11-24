@@ -1,4 +1,4 @@
-process LOCAL_APP {
+process LOCAL_APP_DEMULTIPLEX {
     tag "$id"
     label 'process_high'
 
@@ -6,18 +6,16 @@ process LOCAL_APP {
     containerOptions '--entrypoint=""'
 
     input:
-    path runfolder
-    path samplesheet
-    path json
+    path val(id), path(runfolder), path(samplesheet), path(json)
     path resourcefolder
 
     output:
-    path "cromwell-executions"   , emit: cromwell_executions
-    path "cromwell-workflow-logs", emit: cromwell_workflow_logs
-    path "inputs.json"           , emit: json
-    path "Logs_Intermediates"    , emit: logs_intermediates
-    path "Results"               , emit: results
-    path "versions.yml"          , emit: versions
+    tuple val(id), path("cromwell-executions")    , emit: cromwell_executions
+    tuple val(id), path("cromwell-workflow-logs") , emit: cromwell_workflow_logs
+    tuple val(id), path("inputs.json")            , emit: json
+    tuple val(id), path("Logs_Intermediates")     , emit: logs_intermediates
+    tuple val(id), path("Results")                , emit: results
+    path "versions.yml"                           , emit: versions
 
     when:
     task.ext.when == null || task.ext.when
