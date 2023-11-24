@@ -108,7 +108,7 @@ workflow.onComplete {
 def construct_fastq_folder_path(it) {
     def path_str = it[5].toString()
     def sample_id = path_str.substring(path_str.lastIndexOf('/') + 1).replace('tso500_', '').replace('.json', '')
-    def fastq_folder_path = it[4] + "FastqGeneration/" + sample_id
+    def fastq_folder_path = file([it[4].toString(), "FastqGeneration", sample_id].join('/'), checkIfExists: true)
     return [ sample_id, it[1], it[2], fastq_folder_path, it[5] ]
 }
 
