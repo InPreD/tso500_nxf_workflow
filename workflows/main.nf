@@ -22,9 +22,10 @@ if (params.tso500_resource_folder) { ch_tso500_resource_folder = file(params.tso
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 */
 
-include { CUSTOM_DUMPSOFTWAREVERSIONS } from '../modules/nf-core/custom/dumpsoftwareversions/main'
-include { LOCAL_APP_DEMULTIPLEX       } from '../modules/local/local_app'
-include { LOCAL_APP_PREPPER           } from '../modules/local/local_app_prepper'
+include { CUSTOM_DUMPSOFTWAREVERSIONS        } from '../modules/nf-core/custom/dumpsoftwareversions/main'
+include { LOCAL_APP as LOCAL_APP_DEMULTIPLEX } from '../modules/local/local_app'
+include { LOCAL_APP as LOCAL_APP_TSO500      } from '../modules/local/local_app'
+include { LOCAL_APP_PREPPER                  } from '../modules/local/local_app_prepper'
 
 include { validateParameters; paramsHelp; paramsSummaryLog; fromSamplesheet } from 'plugin/nf-validation'
 
@@ -48,7 +49,7 @@ workflow MAIN {
 
     // channel holding information about run id, path to run folder and samplesheet
     run_folders = ch_input
-        .map{ it -> return [ it[6], it[7], it[8] ] }
+        .map{ it -> return [ it[6], it[7], it[8], [] ] }
         .unique()
 
     // MODULE: Prepare inputs.json for LocalApp
@@ -59,15 +60,29 @@ workflow MAIN {
 
     // attach the json to the correct run folder information
     local_app_demultiplex_input = run_folders.join(LOCAL_APP_PREPPER.out.demultiplex)
-    LOCAL_APP_PREPPER.out.tso500.view()
-    LOCAL_APP_PREPPER.out.gather.view()
 
-    // MODULE: Run LocalApp TSO500 workflow
+    // MODULE: Run LocalApp demultiplex workflow
     LOCAL_APP_DEMULTIPLEX (
         local_app_demultiplex_input,
         ch_tso500_resource_folder
     )
     versions = versions.mix(LOCAL_APP_DEMULTIPLEX.out.versions.first())
+
+    // construct a channel for each sample
+    local_app_tso500_input = run_folders
+        .join(LOCAL_APP_DEMULTIPLEX.logs_intermediates)
+        .join(LOCAL_APP_PREPPER.out.tso500.transpose())
+        .map{ construct_fastq_folder_path(it) }
+        .view()
+
+    // MODULE: Run LocalApp TSO500 workflow
+    LOCAL_APP_TSO500 (
+        local_app_tso500_input,
+        ch_tso500_resource_folder
+    )
+
+    // MODULE: Run LocalApp Gather workflow
+    LOCAL_APP_PREPPER.out.gather.view()
 
     CUSTOM_DUMPSOFTWAREVERSIONS (
         versions.unique{ it.text }.collectFile(name: 'collated_versions.yml')
@@ -82,6 +97,19 @@ workflow MAIN {
 
 workflow.onComplete {
     NfcoreTemplate.summary(workflow, params, log)
+}
+
+/*
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    FUNCTIONS FOR CHANNEL MANIPULATION
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+*/
+
+def construct_fastq_folder_path(it) {
+    def path_str = it[5].toString()
+    def sample_id = path_str.substring(path_str.lastIndexOf('/') + 1).replace('tso500_', '').replace('.json', '')
+    def fastq_folder_path = it[4] + "FastqGeneration/" + sample_id
+    return [ sample_id, it[1], it[2], fastq_folder_path, it[5] ]
 }
 
 /*

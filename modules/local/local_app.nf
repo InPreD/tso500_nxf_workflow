@@ -1,4 +1,4 @@
-process LOCAL_APP_DEMULTIPLEX {
+process LOCAL_APP {
     tag "$id"
     label 'process_high'
 
@@ -6,7 +6,7 @@ process LOCAL_APP_DEMULTIPLEX {
     containerOptions '--entrypoint=""'
 
     input:
-    tuple val(id), path(runfolder), path(samplesheet), path(json)
+    tuple val(id), path(runfolder), path(samplesheet), path(fastqfolder), path(json)
     path resourcefolder
 
     output:
@@ -14,7 +14,7 @@ process LOCAL_APP_DEMULTIPLEX {
     tuple val(id), path("cromwell-workflow-logs") , emit: cromwell_workflow_logs
     tuple val(id), path("inputs.json")            , emit: json
     tuple val(id), path("Logs_Intermediates")     , emit: logs_intermediates
-    tuple val(id), path("Results")                , emit: results
+    tuple val(id), path("Results")                , emit: results, optional: true
     path "versions.yml"                           , emit: versions
 
     when:
@@ -24,7 +24,7 @@ process LOCAL_APP_DEMULTIPLEX {
     samplesheet = samplesheet ? samplesheet : runfolder + "/SampleSheet.csv"
 
     """
-    sed 's|ANALYSISFOLDER|'`pwd`'|g; s|RESOURCEFOLDER|'`pwd`/$resourcefolder'|g; s|RUNFOLDER|'`pwd`/$runfolder'|g; s|SAMPLESHEETPATH|'`pwd`/$samplesheet'|g' $json > inputs.json
+    sed 's|ANALYSISFOLDER|'`pwd`'|g; s|FASTQFOLDER|'`pwd`/$fastqfolder'|g; s|RESOURCEFOLDER|'`pwd`/$resourcefolder'|g; s|RUNFOLDER|'`pwd`/$runfolder'|g; s|SAMPLESHEETPATH|'`pwd`/$samplesheet'|g' $json > inputs.json
     java \\
         -jar /opt/cromwell/cromwell-36.jar \\
             run \\
