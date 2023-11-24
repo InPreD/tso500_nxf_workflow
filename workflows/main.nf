@@ -33,7 +33,7 @@ if (params.tso500_resource_folder) { ch_tso500_resource_folder = file(params.tso
 */
 
 include { CUSTOM_DUMPSOFTWAREVERSIONS } from '../modules/nf-core/custom/dumpsoftwareversions/main'
-include { LOCAL_APP                   } from '../modules/local/local_app'
+include { LOCAL_APP_DEMULTIPLEX       } from '../modules/local/local_app'
 include { LOCAL_APP_PREPPER           } from '../modules/local/local_app_prepper'
 
 include { validateParameters; paramsHelp; paramsSummaryLog; fromSamplesheet } from 'plugin/nf-validation'
@@ -48,26 +48,39 @@ ch_input = Channel.fromSamplesheet("input")
 
 workflow MAIN {
 
-    ch_versions = Channel.empty()
-    samplesheet = []
+    // empty channel to store all software versions
+    versions = Channel.empty()
 
-    // MODULE: Prepare input.json for LocalApp
-    LOCAL_APP_PREPPER ( 
-        ch_input
+    // channel holding information about run id, path to the run folder and a list of sample ids
+    local_app_prepper_input = ch_input
+        .map{ it -> return [ it[6], it[7], it[1] ] }
+        .groupTuple( by: [ 0, 1 ] )
+
+    // channel holding information about run id, path to run folder and samplesheet
+    run_folders = ch_input
+        .map{ it -> return [ it[6], it[7], it[8] ] }
+        .unique()
+
+    // MODULE: Prepare inputs.json for LocalApp
+    LOCAL_APP_PREPPER (
+        local_app_prepper_input
     )
-    ch_versions = ch_versions.mix(LOCAL_APP_PREPPER.out.versions)
+    versions = versions.mix(LOCAL_APP_PREPPER.out.versions)
+
+    // attach the json to the correct run folder information
+    local_app_demultiplex_input = run_folders.join(LOCAL_APP_PREPPER.out.demultiplex)
+    LOCAL_APP_PREPPER.out.tso500.view()
+    LOCAL_APP_PREPPER.out.tso500.gather()
 
     // MODULE: Run LocalApp TSO500 workflow
-    LOCAL_APP ( 
-        ch_input,
-        samplesheet,
-        LOCAL_APP_PREPPER.out.tso500,
+    LOCAL_APP_DEMULTIPLEX (
+        local_app_demultiplex_input,
         ch_tso500_resource_folder
     )
-    ch_versions = ch_versions.mix(LOCAL_APP.out.versions.first())
+    versions = versions.mix(LOCAL_APP.out.versions.first())
 
     CUSTOM_DUMPSOFTWAREVERSIONS (
-        ch_versions.unique{ it.text }.collectFile(name: 'collated_versions.yml')
+        versions.unique{ it.text }.collectFile(name: 'collated_versions.yml')
     )
 }
 
@@ -79,29 +92,6 @@ workflow MAIN {
 
 workflow.onComplete {
     NfcoreTemplate.summary(workflow, params, log)
-}
-
-/*
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    FUNCTIONS FOR CHANNEL MANIPULATION
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-*/
-
-// Function to get list of [ meta, [ fastq_1, fastq_2 ] ]
-def create_fastq_channel(LinkedHashMap row) {
-    // create meta map
-    def meta = [:]
-    meta.id         = row.sample
-    meta.single_end = false
-
-    // combine paths of the fastq files and the meta map
-    if (!file(row.fastq_1).exists()) {
-        exit 1, "ERROR: Please check input samplesheet -> Read 1 FastQ file does not exist!\n${row.fastq_1}"
-    }
-    if (!file(row.fastq_2).exists()) {
-        exit 1, "ERROR: Please check input samplesheet -> Read 2 FastQ file does not exist!\n${row.fastq_2}"
-    }
-    return [ meta, [ file(row.fastq_1), file(row.fastq_2) ] ]
 }
 
 /*
