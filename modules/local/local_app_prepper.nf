@@ -5,20 +5,23 @@ process LOCAL_APP_PREPPER {
     container "inpred/local_app_prepper:latest"
 
     input:
-    path runfolder
+    tuple val(id), path(runfolder), val(sample_list)
 
     output:
-    path 'gather.json' , emit: gather
-    path 'tso500.json' , emit: tso500
-    path "versions.yml", emit: versions
+    tuple val(id), path('demultiplex.json') , emit: demultiplex
+    tuple val(id), path('gather.json')      , emit: gather
+    tuple val(id), path('tso500_*.json')    , emit: tso500
+    tuple val(id), path('versions.yml')     , emit: versions
 
     when:
     task.ext.when == null || task.ext.when
 
     script:
+    def samples = sample_list.join(',')
     """
     local_app_prepper.py \\
-        -i $runfolder
+        -i $runfolder \\
+        -s $samples
 
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":
