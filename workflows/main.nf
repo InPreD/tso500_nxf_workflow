@@ -7,7 +7,6 @@
 
 def summary_params = NfcoreSchema.paramsSummaryMap(workflow, params)
 
-// TODO: Add all file path parameters for the pipeline to the list below
 // Check input path parameters to see if they exist
 def checkPathParamList = [ params.input ]
 for (param in checkPathParamList) { if (param) { file(param, checkIfExists: true) } }
@@ -85,8 +84,9 @@ workflow MAIN {
     LOCAL_APP_PREPPER.out.gather.view()
 
     CUSTOM_DUMPSOFTWAREVERSIONS (
-        versions.unique{ it.text }.collectFile(name: 'collated_versions.yml')
+        versions.unique().collectFile(name: 'collated_versions.yml')
     )
+
 }
 
 /*

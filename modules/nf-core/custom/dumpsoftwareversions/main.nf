@@ -1,9 +1,7 @@
 process CUSTOM_DUMPSOFTWAREVERSIONS {
     label 'process_single'
 
-    container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
-        'https://depot.galaxyproject.org/singularity/multiqc:1.13--pyhdfd78af_0' :
-        'quay.io/biocontainers/multiqc:1.13--pyhdfd78af_0' }"
+    container "quay.io/biocontainers/multiqc:1.13--pyhdfd78af_0"
 
     input:
     path versions
@@ -18,4 +16,10 @@ process CUSTOM_DUMPSOFTWAREVERSIONS {
     script:
     def args = task.ext.args ?: ''
     template 'dumpsoftwareversions.py'
+
+    stub:
+    """
+    touch software_versions.yml
+    touch versions.yml
+    """
 }
