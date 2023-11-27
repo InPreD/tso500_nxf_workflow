@@ -88,9 +88,11 @@ workflow MAIN {
     // MODULE: Run LocalApp Gather workflow
     gather_inputfolders = LOCAL_APP_PREPPER.out.tso500.transpose()
         .map{ it -> return [ get_sample_id(it[1]), it[0] ] }
-        .join(LOCAL_APP_TSO500.out.results)
-        .join(LOCAL_APP_TSO500.out.logs_intermediates)
-        .map{ it -> return [ it[1], it[2], it[3] ] }
+        .join(LOCAL_APP_TSO500.out.results
+            .join(LOCAL_APP_TSO500.out.logs_intermediates)
+            .groupTuple()
+        )
+        .map{ it -> return [ it[1], it[2] ] }
         .concat(LOCAL_APP_DEMULTIPLEX.out.logs_intermediates)
         .groupTuple()
     gather_input = run_folders
