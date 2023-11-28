@@ -67,7 +67,7 @@ process GATHER {
 
     script:
     samplesheet = samplesheet ? samplesheet : runfolder + '/SampleSheet.csv'
-    def inputfolderlist = '["' + inputsfolders.join('","')  + '"]'
+    def inputfolderlist = '["' + inputfolders.join('","')  + '"]'
 
     """
     sed 's|ANALYSISFOLDER|'`pwd`'|g; s|INPUTFOLDERLIST|'`pwd`/$inputfolderlist'|g; s|RESOURCEFOLDER|'`pwd`/$resourcefolder'|g; s|RUNFOLDER|'`pwd`/$runfolder'|g; s|SAMPLESHEETPATH|'`pwd`/$samplesheet'|g' $json > inputs.json
