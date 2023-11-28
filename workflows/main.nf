@@ -75,7 +75,7 @@ workflow MAIN {
     // construct a channel for each sample
     local_app_tso500_input = run_folders
         .join(LOCAL_APP_DEMULTIPLEX.out.results)
-        .join(LOCAL_APP_PREPPER.out.tso500.transpose())
+        .combine(LOCAL_APP_PREPPER.out.tso500.transpose(), by: 0)
         .map{ it -> return [ get_sample_id(it[5]), it[1], it[2], it[4], it[5] ] }
         .view()
 
@@ -97,6 +97,7 @@ workflow MAIN {
         .map{ it -> return [ it[0], it[1], it[2] ] }
         .join(gather_inputfolders)
         .join(LOCAL_APP_PREPPER.out.gather)
+        .view()
 
     GATHER (
         gather_input,
