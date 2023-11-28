@@ -74,9 +74,10 @@ workflow MAIN {
 
     // construct a channel for each sample
     local_app_tso500_input = run_folders
-        .join(LOCAL_APP_DEMULTIPLEX.out.logs_intermediates)
+        .join(LOCAL_APP_DEMULTIPLEX.out.results)
         .join(LOCAL_APP_PREPPER.out.tso500.transpose())
-        .map{ construct_fastq_folder_path(it) }
+        .map{ it -> return [ get_sample_id(it[5]), it[1], it[2], it[4], it[5] ] }
+        .view()
 
     // MODULE: Run LocalApp TSO500 workflow
     LOCAL_APP_TSO500 (
@@ -88,12 +89,9 @@ workflow MAIN {
     // MODULE: Run LocalApp Gather workflow
     gather_inputfolders = LOCAL_APP_PREPPER.out.tso500.transpose()
         .map{ it -> return [ get_sample_id(it[1]), it[0] ] }
-        .join(LOCAL_APP_TSO500.out.results
-            .join(LOCAL_APP_TSO500.out.logs_intermediates)
-            .groupTuple()
-        )
+        .join(LOCAL_APP_TSO500.out.results)
         .map{ it -> return [ it[1], it[2] ] }
-        .concat(LOCAL_APP_DEMULTIPLEX.out.logs_intermediates)
+        .concat(LOCAL_APP_DEMULTIPLEX.out.results)
         .groupTuple()
     gather_input = run_folders
         .map{ it -> return [ it[0], it[1], it[2] ] }
@@ -127,12 +125,6 @@ workflow.onComplete {
     FUNCTIONS FOR CHANNEL MANIPULATION
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 */
-
-def construct_fastq_folder_path(it) {
-    def sample_id = get_sample_id(it[5])
-    def fastq_folder_path = file([it[4].toString(), "FastqGeneration"].join('/'), checkIfExists: true)
-    return [ sample_id, it[1], it[2], fastq_folder_path, it[5] ]
-}
 
 def get_sample_id(it) {
     def path_str = it.toString()
