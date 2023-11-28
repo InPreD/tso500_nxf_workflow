@@ -10,8 +10,8 @@ process LOCAL_APP {
     path resourcefolder
 
     output:
-    tuple val(id), path("${id}") , emit: results
-    path "versions.yml"          , emit: versions
+    tuple val(id), path("${output}") , emit: results
+    path "versions.yml"              , emit: versions
 
     when:
     task.ext.when == null || task.ext.when
@@ -19,6 +19,7 @@ process LOCAL_APP {
     script:
     samplesheet = samplesheet ? samplesheet : runfolder + "/SampleSheet.csv"
     fastqfolder = fastqfolder ? fastqfolder + "/Logs_Intermediates/FastqGeneration": ""
+    output = "localapp_" + id
 
     """
     sed 's|ANALYSISFOLDER|'`pwd`'|g; s|FASTQFOLDER|'`pwd`/$fastqfolder'|g; s|RESOURCEFOLDER|'`pwd`/$resourcefolder'|g; s|RUNFOLDER|'`pwd`/$runfolder'|g; s|SAMPLESHEETPATH|'`pwd`/$samplesheet'|g' $json > inputs.json
@@ -27,11 +28,11 @@ process LOCAL_APP {
             run \\
             -i inputs.json \\
             /opt/illumina/wdl/TSO500Workflow.wdl
-    mkdir $id
+    mkdir $output
     if [ -d "Results" ]; then
-        mv Results $id/
+        mv Results $output/
     fi
-    mv cromwell-executions cromwell-workflow-logs Logs_Intermediates $id/
+    mv cromwell-executions cromwell-workflow-logs Logs_Intermediates $output/
 
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":
