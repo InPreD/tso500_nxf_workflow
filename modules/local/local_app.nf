@@ -71,7 +71,7 @@ process GATHER {
     def inputfolderlist = '["' + pwd + inputfolders.join('","' + pwd)  + '"]'
 
     """
-    sed 's|ANALYSISFOLDER|'`pwd`'|g; s|"INPUTFOLDERLIST"|'$inputfolderlist'|g; s|RESOURCEFOLDER|'`pwd`/$resourcefolder'|g; s|RUNFOLDER|'`pwd`/$runfolder'|g; s|SAMPLESHEETPATH|'`pwd`/$samplesheet'|g' $json > inputs.json
+    sed 's|ANALYSISFOLDER|'`pwd`'|g; s|"INPUTFOLDERLIST"|$inputfolderlist|g; s|RESOURCEFOLDER|'`pwd`/$resourcefolder'|g; s|RUNFOLDER|'`pwd`/$runfolder'|g; s|SAMPLESHEETPATH|'`pwd`/$samplesheet'|g' $json > inputs.json
     java \\
         -jar /opt/cromwell/cromwell-36.jar \\
             run \\
