@@ -67,11 +67,11 @@ process GATHER {
 
     script:
     samplesheet = samplesheet ? samplesheet : runfolder + '/SampleSheet.csv'
-    def pwd = System.properties['user.dir'] + '/'
-    def inputfolderlist = '["' + pwd + inputfolders.join('","' + pwd)  + '"]'
+    def inputfolderlist = '["WORKDIR' + inputfolders.join('","WORKDIR') + '"]'
 
     """
-    sed 's|ANALYSISFOLDER|'`pwd`'|g; s|"INPUTFOLDERLIST"|$inputfolderlist|g; s|RESOURCEFOLDER|'`pwd`/$resourcefolder'|g; s|RUNFOLDER|'`pwd`/$runfolder'|g; s|SAMPLESHEETPATH|'`pwd`/$samplesheet'|g' $json > inputs.json
+    sed 's|ANALYSISFOLDER|'`pwd`'|g; s|"INPUTFOLDERLIST"|$inputfolderlist|g; s|RESOURCEFOLDER|'`pwd`/$resourcefolder'|g; s|RUNFOLDER|'`pwd`/$runfolder'|g; s|SAMPLESHEETPATH|'`pwd`/$samplesheet'|g' $json > tmp.json
+    sed 's|WORKDIR|'`pwd`'|g' tmp.json > inputs.json
     java \\
         -jar /opt/cromwell/cromwell-36.jar \\
             run \\
