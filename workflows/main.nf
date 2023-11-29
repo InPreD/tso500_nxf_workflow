@@ -77,7 +77,6 @@ workflow MAIN {
         .join(LOCAL_APP_DEMULTIPLEX.out.results)
         .combine(LOCAL_APP_PREPPER.out.tso500.transpose(), by: 0)
         .map{ it -> return [ get_sample_id(it[5]), it[1], it[2], it[4], it[5] ] }
-        .view()
 
     // MODULE: Run LocalApp TSO500 workflow
     LOCAL_APP_TSO500 (
@@ -97,7 +96,6 @@ workflow MAIN {
         .map{ it -> return [ it[0], it[1], it[2] ] }
         .join(gather_inputfolders)
         .join(LOCAL_APP_PREPPER.out.gather)
-        .view()
 
     GATHER (
         gather_input,
