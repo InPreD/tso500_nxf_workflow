@@ -1,6 +1,6 @@
 process LOCAL_APP {
     tag "$id"
-    label 'process_high'
+    label 'process_medium'
 
     container 'docker-oncology.dockerhub.illumina.com/acadia/acadia-500-wdl-workflow:ruo-2.2.0.12'
     containerOptions '--entrypoint=""'
@@ -52,7 +52,7 @@ process LOCAL_APP {
 
 process GATHER {
     tag "$id"
-    label 'process_high'
+    label 'process_medium'
 
     container 'docker-oncology.dockerhub.illumina.com/acadia/acadia-500-wdl-workflow:ruo-2.2.0.12'
     containerOptions '--entrypoint=""'
