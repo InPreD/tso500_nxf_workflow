@@ -65,8 +65,7 @@ process GATHER {
     tuple val(id), path("cromwell-executions")    , emit: cromwell_executions
     tuple val(id), path("cromwell-workflow-logs") , emit: cromwell_workflow_logs
     tuple val(id), path("inputs.json")            , emit: json
-    tuple val(id), path("Logs_Intermediates")     , emit: logs_intermediates
-    tuple val(id), path("Results")                , emit: results, optional: true
+    tuple val(id), path("Results")                , emit: results
     path "versions.yml"                           , emit: versions
 
     when:
