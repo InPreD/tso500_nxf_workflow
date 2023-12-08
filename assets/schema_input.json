@@ -1,6 +1,6 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema",
-  "title": "sfb pipeline - params.input schema",
+  "title": "inpred/tso500_nxf_workflow - params.input schema",
   "description": "Schema for the file provided with params.input (ideally a samplesheet)",
   "type": "array",
   "items": {
