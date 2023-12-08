@@ -34,5 +34,5 @@
 	"remoteUser": "${localEnv:USER}",
 
 	// Use 'postCreateCommand' to run commands after the container is created
-	"postCreateCommand": "sudo dockerd-entrypoint.sh;"
+	"postCreateCommand": "sleep 20s && sudo umount -l /tmp; sudo dockerd-entrypoint.sh;"
 }
