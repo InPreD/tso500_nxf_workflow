@@ -21,7 +21,7 @@
 ### Run
 
 ```bash
-$ nextflow run https://github.com/InPreD/tso500_nfx_workflow -r main -profile docker --input <nxf samplesheet> --outdir output --tso500_resource_folder <path to resources>
+$ nextflow run https://github.com/InPreD/tso500_nxf_workflow -r main -profile docker --input <nxf samplesheet> --outdir output --tso500_resource_folder <path to resources>
 ```
 
 ### Output
