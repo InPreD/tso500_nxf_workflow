@@ -29,4 +29,9 @@ process LOCAL_APP_PREPPER {
         python: \$(python --version | sed 's/Python //g')
     END_VERSIONS
     """
+
+    stub:
+    """
+    touch demultiplex.json gather.json tso500_IPH0001-D01-T01-A1.json tso500_IPH0001-D01-N01-A1.json versions.yml
+    """
 }

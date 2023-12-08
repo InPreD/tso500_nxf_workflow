@@ -41,6 +41,13 @@ process LOCAL_APP {
         tso500: \$(grep "TSO500.workflowVersion" inputs.json | sed 's/.*"TSO500.workflowVersion": "\\|"\$//g')
     END_VERSIONS
     """
+
+    stub:
+    output = 'localapp_' + id
+    """
+    touch versions.yml
+    mkdir $output
+    """
 }
 
 process GATHER {
@@ -84,5 +91,11 @@ process GATHER {
         java: \$(java -version 2>&1 | grep version | sed 's/^openjdk version "\\|"\$//g')
         gather: \$(grep "GatherResultsWorkflow.workflowVersion" inputs.json | sed 's/.*"GatherResultsWorkflow.workflowVersion": "\\|"\$//g')
     END_VERSIONS
+    """
+
+    stub:
+    """
+    touch inputs.json versions.yml
+    mkdir cromwell-executions cromwell-workflow-logs Results
     """
 }
