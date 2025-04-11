@@ -1,4 +1,5 @@
 .nextflow*
+.nohup.out
 null
 test_stub
 work
