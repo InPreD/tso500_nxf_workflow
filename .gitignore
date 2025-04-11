@@ -1,5 +1,5 @@
 .nextflow*
-.nohup.out
+nohup.out
 null
 test_stub
 work
