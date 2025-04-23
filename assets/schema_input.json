@@ -27,10 +27,7 @@
                 "errorMessage": "Sample type must be either T(umor) or N(ormal), case insensitive"
             },
             "tumor_site": {
-                "type": [
-                    "string",
-                    "integer"
-                ],
+                "type": ["string", "integer"],
                 "pattern": "^(\\d{2}|XX)$",
                 "minimum": 10,
                 "maximum": 30,
