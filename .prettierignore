@@ -1,1 +1,9 @@
+*.pyc
+.DS_Store
+.nextflow*
 bin/
+data/
+results/
+testing*
+testing/
+work/
