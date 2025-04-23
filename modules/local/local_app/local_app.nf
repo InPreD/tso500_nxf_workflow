@@ -7,7 +7,7 @@ process LOCAL_APP {
 
     input:
     tuple val(id), path(runfolder), path(samplesheet), path(fastqfolder), path(json)
-    val resourcefolder
+    path resourcefolder
 
     output:
     tuple val(id), path("${output}") , emit: results
@@ -64,7 +64,7 @@ process GATHER {
 
     input:
     tuple val(id), path(runfolder), path(samplesheet), path(inputfolders), path(json)
-    val resourcefolder
+    path resourcefolder
 
     output:
     tuple val(id), path("cromwell-executions")    , emit: cromwell_executions

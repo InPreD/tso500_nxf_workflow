@@ -51,7 +51,7 @@ workflow MAIN {
     // MODULE: Run LocalApp demultiplex workflow
     LOCAL_APP_DEMULTIPLEX (
         local_app_demultiplex_input,
-        params.tso500_resource_folder
+        file(params.tso500_resource_folder)
     )
     versions = versions.mix(LOCAL_APP_DEMULTIPLEX.out.versions.first())
 
@@ -64,7 +64,7 @@ workflow MAIN {
     // MODULE: Run LocalApp TSO500 workflow
     LOCAL_APP_TSO500 (
         local_app_tso500_input,
-        params.tso500_resource_folder
+        file(params.tso500_resource_folder)
     )
     versions = versions.mix(LOCAL_APP_TSO500.out.versions.first())
 
@@ -83,7 +83,7 @@ workflow MAIN {
     // MODULE: Run LocalApp Gather workflow
     GATHER (
         gather_input,
-        params.tso500_resource_folder
+        file(params.tso500_resource_folder)
     )
     versions = versions.mix(GATHER.out.versions.first())
 
