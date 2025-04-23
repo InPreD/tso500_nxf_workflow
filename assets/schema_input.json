@@ -27,9 +27,14 @@
                 "errorMessage": "Sample type must be either T(umor) or N(ormal), case insensitive"
             },
             "tumor_site": {
-                "type": "string",
-                "pattern": "^(\\d{1,2}|NA)$",
-                "errorMessage": "Tumor site should be number id or NA if sample is not tumor material"
+                "type": [
+                    "string",
+                    "integer"
+                ],
+                "pattern": "^(\\d{2}|XX)$",
+                "minimum": 10,
+                "maximum": 30,
+                "errorMessage": "Tumor site should be a two digit number id or XX if sample is not tumor material (refer to InPreD sample ID nomenclature v4 - https://tsoppi.readthedocs.io/en/latest/inpred_nomenclature.html)"
             },
             "tumor_content": {
                 "type": "integer",
