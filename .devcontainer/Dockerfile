@@ -8,11 +8,11 @@ COPY --from=hadolint /bin/hadolint /bin/hadolint
 ARG FULLNAME="Your full name"
 ARG MAIL="some@mail.address"
 ARG USERNAME=something
-ARG USER_GID=${USER_UID}
 ARG USER_UID=1000
+ARG USER_GID=${USER_UID}
 # Install dependencies
 USER root
-ENV DEBIAN_FRONTEND noninteractive
+ENV DEBIAN_FRONTEND=noninteractive
 RUN apt-get update \
     && apt-get install -y --no-install-recommends \
         fish=3.3.1+ds-3 \
