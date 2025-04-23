@@ -12,7 +12,7 @@ jobs:
     steps:
       - name: Check out pipeline code
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
-      - name: linting
+      - name: Linting
         run: ec --exclude '^.devcontainer/|^.git/|README.md'
   nf-core:
     runs-on: ubuntu-latest
@@ -22,7 +22,7 @@ jobs:
     steps:
       - name: Check out pipeline code
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
-      - name: linting
+      - name: Linting
         run: nf-core pipelines lint -w
   prettier:
     runs-on: ubuntu-latest
@@ -32,7 +32,7 @@ jobs:
     steps:
       - name: Check out pipeline code
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
-      - name: linting
+      - name: Linting
         run: prettier -c .
   nextflow:
     runs-on: ubuntu-latest
@@ -40,7 +40,9 @@ jobs:
       image: nextflow/nextflow:24.10.5
       options: --user root
     steps:
+      - name: Install tar
+        run: yum install -y tar
       - name: Check out pipeline code
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
-      - name: stubbing
+      - name: Stubbing
         run: nextflow run . -stub-run -profile test_stub
