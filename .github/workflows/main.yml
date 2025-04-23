@@ -4,7 +4,17 @@ on:
   pull_request:
 
 jobs:
-  linting:
+  editorconfig:
+    runs-on: ubuntu-latest
+    container:
+      image: mstruebing/editorconfig-checker:v3.2.1
+      options: --user root
+    steps:
+      - name: Check out pipeline code
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
+      - name: linting
+        run: ec --exclude '^.devcontainer/|^.git/|README.md'
+  nf-core:
     runs-on: ubuntu-latest
     container:
       image: nfcore/tools:3.2.0
@@ -12,7 +22,15 @@ jobs:
     steps:
       - name: Check out pipeline code
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
-      - name: debug
-        run: pwd && ls -a
-      - name: nf-core lint
+      - name: linting
         run: nf-core pipelines lint -w
+  prettier:
+    runs-on: ubuntu-latest
+    container:
+      image: jauderho/prettier:3.5.3
+      options: --user root
+    steps:
+      - name: Check out pipeline code
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
+      - name: linting
+        run: prettier -c .
