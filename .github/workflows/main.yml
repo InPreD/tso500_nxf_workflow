@@ -6,11 +6,11 @@ on:
 jobs:
   linting:
     runs-on: ubuntu-latest
-    container: nfcore/gitpod:3.2.0
+    container:
+      image: nfcore/tools:3.2.0
+      options: --user root
     steps:
       - name: Check out pipeline code
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
-      - name: prettier
-        run: prettier -c ${{ github.workspace }}
       - name: nf-core lint
         run: nf-core pipelines lint -d ${{ github.workspace }} -w
