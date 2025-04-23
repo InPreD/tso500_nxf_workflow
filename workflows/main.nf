@@ -1,34 +1,17 @@
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    IMPORT PLUGINS
+    IMPORT MODULES / SUBWORKFLOWS / FUNCTIONS
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 */
 
-include { fromSamplesheet } from 'plugin/nf-validation'
-
-/*
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    VALIDATE INPUTS
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-*/
-
-def summary_params = NfcoreSchema.paramsSummaryMap(workflow, params)
-
-// Check mandatory parameters and put into channels
-ch_input = Channel.fromSamplesheet("input")
-ch_tso500_resource_folder = file(params.tso500_resource_folder, checkIfExists: true)
-
-/*
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    IMPORT MODULES/SUBWORKFLOWS
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-*/
-
-include { CUSTOM_DUMPSOFTWAREVERSIONS        } from '../modules/nf-core/custom/dumpsoftwareversions/main'
-include { GATHER                             } from '../modules/local/local_app'
-include { LOCAL_APP as LOCAL_APP_DEMULTIPLEX } from '../modules/local/local_app'
-include { LOCAL_APP as LOCAL_APP_TSO500      } from '../modules/local/local_app'
-include { LOCAL_APP_PREPPER                  } from '../modules/local/local_app_prepper'
+include { GATHER                             } from '../modules/local/local_app/local_app'
+include { LOCAL_APP as LOCAL_APP_DEMULTIPLEX } from '../modules/local/local_app/local_app'
+include { LOCAL_APP as LOCAL_APP_TSO500      } from '../modules/local/local_app/local_app'
+include { LOCAL_APP_PREPPER                  } from '../modules/local/local_app_prepper/local_app_prepper'
+include { paramsSummaryMap                   } from 'plugin/nf-schema'
+include { samplesheetToList                  } from 'plugin/nf-schema'
+include { softwareVersionsToYAML             } from '../subworkflows/nf-core/utils_nfcore_pipeline'
+include { validateParameters                 } from 'plugin/nf-schema'
 
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -99,11 +82,14 @@ workflow MAIN {
     )
     versions = versions.mix(GATHER.out.versions.first())
 
-    CUSTOM_DUMPSOFTWAREVERSIONS (
-        versions.unique().collectFile(name: 'collated_versions.yml')
-    )
-
-}
+    // collate and save software versions
+    softwareVersionsToYAML(versions)
+        .collectFile(
+            storeDir: "${params.outdir}/pipeline_info",
+            name:  'software_versions.yml',
+            sort: true,
+            newLine: true
+        ).set { ch_collated_versions }
 
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -111,8 +97,6 @@ workflow MAIN {
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 */
 
-workflow.onComplete {
-    NfcoreTemplate.summary(workflow, params, log)
 }
 
 /*

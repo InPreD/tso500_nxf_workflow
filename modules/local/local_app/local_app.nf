@@ -7,7 +7,7 @@ process LOCAL_APP {
 
     input:
     tuple val(id), path(runfolder), path(samplesheet), path(fastqfolder), path(json)
-    path resourcefolder
+    val resourcefolder
 
     output:
     tuple val(id), path("${output}") , emit: results
@@ -45,8 +45,13 @@ process LOCAL_APP {
     stub:
     output = 'localapp_' + id
     """
-    touch versions.yml
     mkdir $output
+    cat <<-END_VERSIONS > versions.yml
+    "${task.process}":
+        cromwell: stub
+        java: stub
+        tso500: stub
+    END_VERSIONS
     """
 }
 
@@ -59,7 +64,7 @@ process GATHER {
 
     input:
     tuple val(id), path(runfolder), path(samplesheet), path(inputfolders), path(json)
-    path resourcefolder
+    val resourcefolder
 
     output:
     tuple val(id), path("cromwell-executions")    , emit: cromwell_executions
@@ -94,7 +99,13 @@ process GATHER {
 
     stub:
     """
-    touch inputs.json versions.yml
+    touch inputs.json
     mkdir cromwell-executions cromwell-workflow-logs Results
+    cat <<-END_VERSIONS > versions.yml
+    "${task.process}":
+        cromwell: stub
+        java: stub
+        tso500: stub
+    END_VERSIONS
     """
 }
