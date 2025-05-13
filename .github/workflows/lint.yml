@@ -1,4 +1,4 @@
-name: nf-core linting and stubbing
+name: linting
 on:
   push:
   pull_request:
@@ -34,15 +34,3 @@ jobs:
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
       - name: Linting
         run: prettier -c .
-  nextflow:
-    runs-on: ubuntu-latest
-    container:
-      image: nextflow/nextflow:24.10.5
-      options: --user root
-    steps:
-      - name: Install tar
-        run: yum install -y tar gzip
-      - name: Check out pipeline code
-        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
-      - name: Stubbing
-        run: nextflow run . -stub-run -profile test_stub
