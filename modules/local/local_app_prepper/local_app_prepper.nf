@@ -11,7 +11,7 @@ process LOCAL_APP_PREPPER {
     tuple val(id), path('demultiplex.json') , emit: demultiplex
     tuple val(id), path('gather.json')      , emit: gather
     tuple val(id), path('tso500_*.json')    , emit: tso500
-    tuple val(id), path('versions.yml')     , emit: versions
+    path 'versions.yml'                     , emit: versions
 
     when:
     task.ext.when == null || task.ext.when
@@ -32,6 +32,11 @@ process LOCAL_APP_PREPPER {
 
     stub:
     """
-    touch demultiplex.json gather.json tso500_IPH0001-D01-T01-A1.json tso500_IPH0001-D01-N01-A1.json versions.yml
+    touch demultiplex.json gather.json tso500_IPH0001-D01-T01-A1.json tso500_IPH0001-D01-N01-A1.json
+    cat <<-END_VERSIONS > versions.yml
+    "${task.process}":
+        local_app_prepper: stub
+        python: stub
+    END_VERSIONS
     """
 }
