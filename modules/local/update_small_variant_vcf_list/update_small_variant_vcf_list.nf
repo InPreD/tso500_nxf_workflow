@@ -28,60 +28,60 @@ process UPDATE_SMALL_VARIANT_VCF_LIST {
     BAD_SAMPLE_TYPE_CODES=()
     for SAMPLE_VCF in `ls -1 ${results}/*/*/*_MergedSmallVariants.genome.vcf`
     do
-      SAMPLE_ID=`echo \${SAMPLE_VCF} | sed "s/\\(.*\\/\\)\\(.*\\)\\(_MergedSmallVariants.genome.vcf\\)/\\\\2/"`
-      SAMPLE_TYPE_CODE=`echo \${SAMPLE_ID} | awk '{print substr(\$1, 13, 1)}'`
+        SAMPLE_ID=`echo \${SAMPLE_VCF} | sed "s/\\(.*\\/\\)\\(.*\\)\\(_MergedSmallVariants.genome.vcf\\)/\\\\2/"`
+        SAMPLE_TYPE_CODE=`echo \${SAMPLE_ID} | awk '{print substr(\$1, 13, 1)}'`
 
-      # check that sample type code is not an empty string
-      if [[  -z "\${SAMPLE_TYPE_CODE// }" ]]
-      then
-          echo "[ERR] \\\$SAMPLE_TYPE_CODE cannot be empty! Check that sample IDs follow inpred nomenclature"
-          echo "[ERR] Exiting now..."
-          exit 1
-      fi
+        # check that sample type code is not an empty string
+        if [[  -z "\${SAMPLE_TYPE_CODE// }" ]]
+        then
+            echo "[ERR] \\\$SAMPLE_TYPE_CODE cannot be empty! Check that sample IDs follow inpred nomenclature"
+            echo "[ERR] Exiting now..."
+            exit 1
+        fi
 
-      PATIENT_ID=\${SAMPLE_ID%%-*}
-      PATIENT_SAMPLE_COUNT=`grep "\${PATIENT_ID}" ${tmp_list} | wc -l`
+        PATIENT_ID=\${SAMPLE_ID%%-*}
+        PATIENT_SAMPLE_COUNT=`grep "\${PATIENT_ID}" ${tmp_list} | wc -l`
 
-      SAMPLE_TYPE_CODE_OK_STRING="[OK]"
-      if [ \${SAMPLE_TYPE_CODE} != "T" ] && [ \${SAMPLE_TYPE_CODE} != "N" ]
-      then
-        SAMPLE_TYPE_CODE_OK_STRING="[not \"T\" or \"N\"!]"
-        echo "[WARN] Unknown sample type code '\$SAMPLE_TYPE_CODE' encountered!"
-        echo "[WARN] Only sample type codes 'T' and 'N' are allowed in the VCF list file!"
-        case \${SAMPLE_TYPE_CODE} in
-            ["P","p","R","r","D","d","C","L","M","X"])
-            echo "[INFO] Replacing sample type code '\$SAMPLE_TYPE_CODE' with value 'T' "
-            sed -i 's/[P,p,R,r,D,d,C,L,M,X]\$/T/' ${tmp_list}
-            SAMPLE_TYPE_CODE="T"
-            SAMPLE_TYPE_CODE_OK_STRING="[OK]"
-            ;;
-        *)
-            echo "[WARN] You need to manually edit ${tmp_list} by replacing the unknown sample type code '\$SAMPLE_TYPE_CODE' with either 'T' or 'N' "
-            BAD_SAMPLE_TYPE_CODES+=(\${SAMPLE_TYPE_CODE})
-            ;;
-        esac
-      fi
+        SAMPLE_TYPE_CODE_OK_STRING="[OK]"
+        if [ \${SAMPLE_TYPE_CODE} != "T" ] && [ \${SAMPLE_TYPE_CODE} != "N" ]
+        then
+            SAMPLE_TYPE_CODE_OK_STRING="[not \"T\" or \"N\"!]"
+            echo "[WARN] Unknown sample type code '\$SAMPLE_TYPE_CODE' encountered!"
+            echo "[WARN] Only sample type codes 'T' and 'N' are allowed in the VCF list file!"
+            case \${SAMPLE_TYPE_CODE} in
+                ["P","p","R","r","D","d","C","L","M","X"])
+                echo "[INFO] Replacing sample type code '\$SAMPLE_TYPE_CODE' with value 'T' "
+                sed -i 's/[P,p,R,r,D,d,C,L,M,X]\$/T/' ${tmp_list}
+                SAMPLE_TYPE_CODE="T"
+                SAMPLE_TYPE_CODE_OK_STRING="[OK]"
+                ;;
+            *)
+                echo "[WARN] You need to manually edit ${tmp_list} by replacing the unknown sample type code '\$SAMPLE_TYPE_CODE' with either 'T' or 'N' "
+                BAD_SAMPLE_TYPE_CODES+=(\${SAMPLE_TYPE_CODE})
+                ;;
+            esac
+        fi
 
-      PATIENT_SAMPLE_COUNT_OK_STRING="[OK]"
-      if [ \${PATIENT_SAMPLE_COUNT} -ne 1 ]
-      then
-        PATIENT_SAMPLE_COUNT_OK_STRING="[not 1!]"
-      fi
+        PATIENT_SAMPLE_COUNT_OK_STRING="[OK]"
+        if [ \${PATIENT_SAMPLE_COUNT} -ne 1 ]
+        then
+            PATIENT_SAMPLE_COUNT_OK_STRING="[not 1!]"
+        fi
 
-      echo "[INFO] sample VCF: \${SAMPLE_VCF}"
-      echo "[INFO] sample ID: \${SAMPLE_ID}"
-      echo "[INFO] sample type code: \${SAMPLE_TYPE_CODE} \${SAMPLE_TYPE_CODE_OK_STRING}"
-      echo "[INFO] patient ID: \${PATIENT_ID}"
-      echo "[INFO] patient sample count: \${PATIENT_SAMPLE_COUNT} \${PATIENT_SAMPLE_COUNT_OK_STRING}"
+        echo "[INFO] sample VCF: \${SAMPLE_VCF}"
+        echo "[INFO] sample ID: \${SAMPLE_ID}"
+        echo "[INFO] sample type code: \${SAMPLE_TYPE_CODE} \${SAMPLE_TYPE_CODE_OK_STRING}"
+        echo "[INFO] patient ID: \${PATIENT_ID}"
+        echo "[INFO] patient sample count: \${PATIENT_SAMPLE_COUNT} \${PATIENT_SAMPLE_COUNT_OK_STRING}"
     done
 
     if [ \${#BAD_SAMPLE_TYPE_CODES[@]} -gt 0 ]
     then
-      echo "[ERR] The following unknown SAMPLE_TYPE_CODE(s) exist in ${tmp_list}:"
-      echo "\${BAD_SAMPLE_TYPE_CODES[@]}"
-      echo "[ERR] You need to manually edit ${tmp_list} to have only sample codes 'T' or 'N' "
-      echo "[ERR] Exiting now..."
-      exit 1
+        echo "[ERR] The following unknown SAMPLE_TYPE_CODE(s) exist in ${tmp_list}:"
+        echo "\${BAD_SAMPLE_TYPE_CODES[@]}"
+        echo "[ERR] You need to manually edit ${tmp_list} to have only sample codes 'T' or 'N' "
+        echo "[ERR] Exiting now..."
+        exit 1
     fi
 
     echo "[INFO] checking for control samples in temporary VCF list and removing them"
