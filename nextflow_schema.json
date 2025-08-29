@@ -10,7 +10,7 @@
             "type": "object",
             "fa_icon": "fas fa-terminal",
             "description": "Define where the pipeline should find input data and save output data.",
-            "required": ["input", "outdir", "tso500_resource_folder"],
+            "required": ["input", "outdir", "tso500_resource_folder", "small_variant_vcf_list"],
             "properties": {
                 "input": {
                     "type": "string",
@@ -36,6 +36,16 @@
                     "description": "Path to directory where all reference files, required by the TSO500 LocalApp, are stored.",
                     "help_text": "The resource directory is usually obtained together with the LocalApp image.",
                     "fa_icon": "fas fa-folder-open"
+                },
+                "small_variant_vcf_list": {
+                    "type": "string",
+                    "format": "file-path",
+                    "exists": true,
+                    "mimetype": "text/tsv",
+                    "pattern": "^\\S+\\.tsv$",
+                    "description": "Path to tab-separated file containing list of vcf files used to update the small variant recurrence table.",
+                    "help_text": "Can be an empty file if no previous VCF files are available.",
+                    "fa_icon": "fas fa-file-tsv"
                 }
             }
         },

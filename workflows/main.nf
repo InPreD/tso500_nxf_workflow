@@ -8,6 +8,7 @@ include { GATHER                             } from '../modules/local/local_app/
 include { LOCAL_APP as LOCAL_APP_DEMULTIPLEX } from '../modules/local/local_app/local_app'
 include { LOCAL_APP as LOCAL_APP_TSO500      } from '../modules/local/local_app/local_app'
 include { LOCAL_APP_PREPPER                  } from '../modules/local/local_app_prepper/local_app_prepper'
+include { UPDATE_SMALL_VARIANT_VCF_LIST      } from '../modules/local/update_small_variant_vcf_list/update_small_variant_vcf_list'
 include { paramsSummaryMap                   } from 'plugin/nf-schema'
 include { samplesheetToList                  } from 'plugin/nf-schema'
 include { softwareVersionsToYAML             } from '../subworkflows/nf-core/utils_nfcore_pipeline'
@@ -86,6 +87,13 @@ workflow MAIN {
         file(params.tso500_resource_folder)
     )
     versions = versions.mix(GATHER.out.versions.first())
+
+    // MODULE: Update small variant vcf list
+    UPDATE_SMALL_VARIANT_VCF_LIST (
+        GATHER.out.results,
+        file(params.small_variant_vcf_list)
+    )
+    versions = versions.mix(UPDATE_SMALL_VARIANT_VCF_LIST.out.versions.first())
 
     // collate and save software versions
     softwareVersionsToYAML(versions)
