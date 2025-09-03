@@ -4,14 +4,16 @@
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 */
 
-include { GATHER                             } from '../modules/local/local_app/local_app'
-include { LOCAL_APP as LOCAL_APP_DEMULTIPLEX } from '../modules/local/local_app/local_app'
-include { LOCAL_APP as LOCAL_APP_TSO500      } from '../modules/local/local_app/local_app'
-include { LOCAL_APP_PREPPER                  } from '../modules/local/local_app_prepper/local_app_prepper'
-include { paramsSummaryMap                   } from 'plugin/nf-schema'
-include { samplesheetToList                  } from 'plugin/nf-schema'
-include { softwareVersionsToYAML             } from '../subworkflows/nf-core/utils_nfcore_pipeline'
-include { validateParameters                 } from 'plugin/nf-schema'
+include { GATHER                                    } from '../modules/local/local_app/local_app'
+include { LOCAL_APP as LOCAL_APP_DEMULTIPLEX        } from '../modules/local/local_app/local_app'
+include { LOCAL_APP as LOCAL_APP_TSO500             } from '../modules/local/local_app/local_app'
+include { LOCAL_APP_PREPPER                         } from '../modules/local/local_app_prepper/local_app_prepper'
+include { paramsSummaryMap                          } from 'plugin/nf-schema'
+include { samplesheetToList                         } from 'plugin/nf-schema'
+include { softwareVersionsToYAML                    } from '../subworkflows/nf-core/utils_nfcore_pipeline'
+include { validateParameters                        } from 'plugin/nf-schema'
+include { METRICS_PLOTTING as ALL_METRICS_PLOTTING  } from '../modules/local/ous_metrics/ous_metrics.nf'
+include { METRICS_PLOTTING as LAST_N_METRICS_PLOTTING } from '../modules/local/ous_metrics/ous_metrics.nf'
 
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -87,6 +89,49 @@ workflow MAIN {
     )
     versions = versions.mix(GATHER.out.versions.first())
 
+    // MODULE: Run metrics plotting workflow
+    // we will create a chennel to handle run Ids in a cleaner way
+    // we wi need metrics files, status files and run ids
+    def csv_file = file(params.mp_run_ids_csv_file)
+    if (!csv_file.exists()) {
+        exit 1, "Error: CSV file '${params.mp_run_ids_csv_file}' not found!"
+    }
+
+    def mp_run_ids = csv_file.readLines()
+                                .collect { it.trim().replaceAll('"','') }
+                                .findAll { it }
+
+    log.info "Total run IDs parsed: ${mp_run_ids.size()}"
+
+    params.mp_run_ids = mp_run_ids
+
+    // Ensure output directories exist
+    new File(params.metrics_plotting_all_runs_output_directory).mkdirs()
+    new File(params.metrics_plotting_output_directory).mkdirs()
+
+    // Determine how many recent runs to plot
+    min_val = Math.min(params.n_runs, mp_run_ids.size())
+
+    if (min_val > 0) {
+        // All runs: no plots
+        ALL_METRICS_PLOTTING(
+            mp_run_ids,
+            params.metrics_plotting_all_runs_output_directory,
+            params.docker_image_id
+        )
+
+        // Last N runs: allow plots
+        def last_n_run_ids = mp_run_ids.subList(mp_run_ids.size() - min_val, mp_run_ids.size())
+
+        LAST_N_METRICS_PLOTTING(
+            last_n_run_ids,
+            params.metrics_plotting_output_directory,
+            params.docker_image_id
+        )
+    } else {
+        log.info "No runs specified for metrics plotting."
+    }
+
     // collate and save software versions
     softwareVersionsToYAML(versions)
         .collectFile(
@@ -95,7 +140,10 @@ workflow MAIN {
             sort: true,
             newLine: true
         ).set { ch_collated_versions }
+    
 
+    
+       
     emit:
     versions = versions
 
