@@ -12,8 +12,8 @@ include { paramsSummaryMap                          } from 'plugin/nf-schema'
 include { samplesheetToList                         } from 'plugin/nf-schema'
 include { softwareVersionsToYAML                    } from '../subworkflows/nf-core/utils_nfcore_pipeline'
 include { validateParameters                        } from 'plugin/nf-schema'
-include { METRICS_PLOTTING as ALL_METRICS_PLOTTING  } from '../modules/local/ous_metrics/ous_metrics.nf'
-include { METRICS_PLOTTING as LAST_N_METRICS_PLOTTING } from '../modules/local/ous_metrics/ous_metrics.nf'
+include { METRICS_PLOTTING as ALL_METRICS_PLOTTING  } from '../modules/local/metrics/metrics.nf'
+include { METRICS_PLOTTING as LAST_N_METRICS_PLOTTING } from '../modules/local/metrics/metrics.nf'
 
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
