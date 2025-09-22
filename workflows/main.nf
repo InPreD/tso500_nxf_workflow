@@ -12,8 +12,8 @@ include { paramsSummaryMap                          } from 'plugin/nf-schema'
 include { samplesheetToList                         } from 'plugin/nf-schema'
 include { softwareVersionsToYAML                    } from '../subworkflows/nf-core/utils_nfcore_pipeline'
 include { validateParameters                        } from 'plugin/nf-schema'
-include { METRICS_PLOTTING as ALL_METRICS_PLOTTING  } from '../modules/local/ous_metrics/ous_metrics.nf'
-include { METRICS_PLOTTING as LAST_N_METRICS_PLOTTING } from '../modules/local/ous_metrics/ous_metrics.nf'
+include { METRICS_PLOTTING as ALL_METRICS_PLOTTING  } from '../modules/local/metrics/metrics.nf'
+include { METRICS_PLOTTING as LAST_N_METRICS_PLOTTING } from '../modules/local/metrics/metrics.nf'
 
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -89,48 +89,50 @@ workflow MAIN {
     )
     versions = versions.mix(GATHER.out.versions.first())
 
-    // MODULE: Run metrics plotting workflow
-    // we will create a chennel to handle run Ids in a cleaner way
-    // we wi need metrics files, status files and run ids
-    def csv_file = file(params.mp_run_ids_csv_file)
-    if (!csv_file.exists()) {
-        exit 1, "Error: CSV file '${params.mp_run_ids_csv_file}' not found!"
-    }
-
-    def mp_run_ids = csv_file.readLines()
-                                .collect { it.trim().replaceAll('"','') }
-                                .findAll { it }
-
-    log.info "Total run IDs parsed: ${mp_run_ids.size()}"
-
-    params.mp_run_ids = mp_run_ids
-
-    // Ensure output directories exist
-    new File(params.metrics_plotting_all_runs_output_directory).mkdirs()
-    new File(params.metrics_plotting_output_directory).mkdirs()
-
-    // Determine how many recent runs to plot
-    min_val = Math.min(params.n_runs, mp_run_ids.size())
-
-    if (min_val > 0) {
-        // All runs: no plots
-        ALL_METRICS_PLOTTING(
-            mp_run_ids,
-            params.metrics_plotting_all_runs_output_directory,
-            params.docker_image_id
-        )
-
-        // Last N runs: allow plots
-        def last_n_run_ids = mp_run_ids.subList(mp_run_ids.size() - min_val, mp_run_ids.size())
-
-        LAST_N_METRICS_PLOTTING(
-            last_n_run_ids,
-            params.metrics_plotting_output_directory,
-            params.docker_image_id
-        )
+    // glob all MetricsOutput.tsv files and join with RunCompletionStatus.xml files for process_metrics_files
+    metrics_output_tsv = channel.fromPath("${params.localapp_root_output_dir}/**_LocalApp_results/Results/MetricsOutput.tsv") // Channel: [ tsv ]
+        .map { file ->
+            def run_id = (file.toString() =~ /(\d{6}_\D{1,3}\d{5,6}(_RUO)?_\d{4}_\w{10})(_TSO_500)?_LocalApp_results/)[0][1]
+            return [ run_id, file ]
+        } // Channel: [ [ run_id, tsv ] ]
+    if (params.decoy_run_completion_status_xml) {
+        metrics_input_ch = metrics_output_tsv
+            .map { run_id, file ->
+                return [ run_id, file, params.decoy_run_completion_status_xml ]
+            } // Channel: [ [ run_id, tsv, xml ] ]
+            .collect(flat: false) // Channel: [ [ [ run_id, tsv, xml ], [ run_id, tsv, xml ], ... ] ]
+            .transpose() // Channel: [ [ run_id, run_id, ... ], [ tsv, tsv, ... ], [ xml, xml, ... ] ]
     } else {
-        log.info "No runs specified for metrics plotting."
+        run_completion_status_xml = channel.fromPath("${params.seq_data_root_output_dir}/*/RunCompletionStatus.xml")
+            .map { file ->
+                def run_id = (file.toString() =~ /(\d{6}_\D{1,3}\d{5,6}(_RUO)?_\d{4}_\w{10})/)[0][1]
+                return [ run_id, file ]
+            } // Channel: [ [ run_id, xml ] ]
+        metrics_input_ch = metrics_output_tsv.join(run_completion_status_xml)
+            .view()
+            .collect(flat: false)
+            .transpose()
+            .collect(flat: false)
     }
+
+    // MODULE: Run metrics plotting
+    ALL_METRICS_PLOTTING(metrics_input_ch)
+
+    //// Determine how many recent runs to plot
+    //min_val = Math.min(params.n_runs, mp_run_ids.size())
+
+    //if (min_val > 0) {
+    //    // All runs: no plots
+    //    ALL_METRICS_PLOTTING(
+    //        mp_run_ids,
+    //    )
+
+    //    // Last N runs: allow plots
+    //    def last_n_run_ids = mp_run_ids.subList(mp_run_ids.size() - min_val, mp_run_ids.size())
+
+    //    LAST_N_METRICS_PLOTTING(
+    //        last_n_run_ids,
+    //    )
 
     // collate and save software versions
     softwareVersionsToYAML(versions)
@@ -140,10 +142,6 @@ workflow MAIN {
             sort: true,
             newLine: true
         ).set { ch_collated_versions }
-    
-
-    
-       
     emit:
     versions = versions
 
