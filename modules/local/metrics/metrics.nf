@@ -1,40 +1,35 @@
 process METRICS_PLOTTING {
-    tag "${run_ids.size()}_runs"
+    tag "${id.size()}_runs"
     label 'process_low'
 
-    container "${docker_image_id}"
-    containerOptions = "-v ${params.local_mounting_dir}:/inpred/data -v \$(pwd):/workdir"
+    container "inpred/tsoppi_main:latest" // is this version v0.3.2?
+    containerOptions = "-v \$(pwd):/workdir"
 
     input:
-    val run_ids
-    val final_output_dir
-    val docker_image_id
+    tuple val(id), path(tsv, stageAs: "?/*"), path(xml, stageAs: "?/*") // stage file with index as folder name
+
     output:
-    path "intermediate_metrics_files/master_metrics_table.tsv"  , emit: 'tsv'
+    path "intermediate_metrics_files/master_metrics_table.tsv", emit: 'tsv'
     path "TSO500_run_metrics.pdf"                             , emit: 'pdf', optional: true
+
     when:
     task.ext.when == null || task.ext.when
 
     script:
-    def argument_list = run_ids.collect { run_id ->
-        "-m ${params.local_mounting_dir}/in/analysis_results/${run_id}_TSO_500_LocalApp_results/Results/MetricsOutput.tsv " +
-        "-r ${params.local_mounting_dir}/in/sequences/decoy_RunCompletionStatus.xml " +
-        "-l ${run_id}"
-    }.join(' ')
-
+    def args = task.ext.args ?: ''
+    for (int i = 0; i < id.size(); i++) {
+        args = args + " -m ${tsv[i]} -r ${xml[i]} -l ${id[i]}"
+    }
     """
     bash /inpred/user_scripts/process_metrics_files.sh \\
-          ${argument_list} \\
-          -o \$(pwd) \\
-          -s ${params.local_mounting_dir} \\
-          ${task.ext.args ?: ''}
-
+          --output_directory \$(pwd) \\
+          --host_system_mounting_directory \$(pwd) \\
+          $args
     """
 
     stub:
     """
-    mkdir -p ${final_output_dir}
-    touch ${final_output_dir}/TSO500_metrics_plots.pdf
-    touch ${final_output_dir}/master_metrics_table.tsv
+    mkdir intermediate_metrics_files
+    touch TSO500_run_metrics.pdf intermediate_metrics_files/master_metrics_table.tsv
     """
 }
