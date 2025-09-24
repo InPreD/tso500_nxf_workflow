@@ -23,9 +23,9 @@ process PROCESS_METRICS_FILES {
     }
     """
     bash /inpred/user_scripts/process_metrics_files.sh \\
-          --output_directory \$(pwd) \\
-          --host_system_mounting_directory \$(pwd) \\
-          $args
+        --output_directory \$(pwd) \\
+        --host_system_mounting_directory \$(pwd) \\
+        $args
 
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":
