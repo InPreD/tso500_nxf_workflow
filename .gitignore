@@ -3,6 +3,10 @@
 .nextflow*
 .nf-test*
 .vscode
+assets/stub_data/tso500_root_output_directory/200103_NS500643_0003_AHG5MGBGYM_TSO_500_LocalApp_results
+assets/stub_data/tso500_root_output_directory/200103_NS500643_0003_AHG5MGBGYM_pipeline_info
+assets/stub_data/tso500_root_output_directory/metrics_plots_NODE_all
+assets/stub_data/tso500_root_output_directory/metrics_plots_NODE_latest
 data/
 log/
 nohup.out
