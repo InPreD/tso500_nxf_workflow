@@ -133,7 +133,7 @@ workflow MAIN {
         metrics_output_tsv_run_completion_status_xml = metrics_output_tsv // Channel: [ [ run_id, tsv ] ]
             .map { run_id, file -> return [ run_id, file, params.decoy_run_completion_status_xml ] } // Channel: [ [ run_id, tsv, xml ] ]
     } else {
-        run_completion_status_xml = channel.fromPath("${params.raw_data_root_output_directory}/*/RunCompletionStatus.xml") // Channel: [ xml ]
+        run_completion_status_xml = channel.fromPath("${params.raw_data_root_directory}/*/RunCompletionStatus.xml") // Channel: [ xml ]
             .map { file ->
                 def run_id = (file.toString() =~ /(\d{6}_\D{1,3}\d{5,6}(_RUO)?_\d{4}_\w{10})/)[0][1]
                 return [ run_id, file ]
