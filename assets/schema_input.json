@@ -1,7 +1,7 @@
 {
     "$schema": "https://json-schema.org/draft/2020-12/schema",
-    "title": "inpred/tso500_nxf_workflow - params.input schema",
-    "description": "Schema for the file provided with params.input (ideally a samplesheet)",
+    "title": "inpred/tso500_nxf_workflow - params.nxf_samplesheet schema",
+    "description": "Schema for the file provided with params.nxf_samplesheet",
     "type": "array",
     "items": {
         "type": "object",

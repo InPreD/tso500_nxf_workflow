@@ -21,7 +21,7 @@ include { PIPELINE_COMPLETION     } from './subworkflows/local/utils_nfcore_tso5
 workflow TSO500_PIPELINE {
 
     take:
-    samplesheet // channel: samplesheet read in from --input
+    samplesheet // channel: samplesheet read in from --nxf_samplesheet
 
     main:
 
@@ -50,7 +50,7 @@ workflow {
         params.monochrome_logs,
         args,
         params.outdir,
-        params.input
+        params.nxf_samplesheet
     )
 
     //
