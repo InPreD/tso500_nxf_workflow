@@ -63,7 +63,7 @@
                 "process_metrics_files_n": {
                     "type": "integer",
                     "description": "Number of sequencing runs to consider.",
-                    "help_text": "Specify the number of sequencing runs to include.",
+                    "help_text": "Specify the number of sequencing runs to include in plotting of the latest n metrics. For examples, process_metrics_files_n = 10 will create a pdf file containing metrics plotted for last 10 sequencing runs.",
                     "fa_icon": "fas fa-hashtag"
                 },
                 "raw_data_root_directory": {
