@@ -2,7 +2,7 @@ process PROCESS_METRICS_FILES {
     tag "${id.size()}_runs"
     label 'process_low'
 
-    container "inpred/tsoppi_main:latest" // is this version v0.3.2?
+    container "inpred/tsoppi_main:v0.3.2"
     containerOptions = "-v \$(pwd):/workdir -v \$(pwd):/inpred/data"
 
     input:
