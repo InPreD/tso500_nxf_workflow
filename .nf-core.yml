@@ -59,6 +59,7 @@ lint:
   multiqc_config: false
   nextflow_config: false
   pipeline_name_conventions: false
+  schema_lint: false
   readme:
     - nextflow_badge
 

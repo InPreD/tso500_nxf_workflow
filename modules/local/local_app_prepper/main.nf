@@ -2,7 +2,7 @@ process LOCAL_APP_PREPPER {
     tag "$id"
     label 'process_low'
 
-    container "inpred/local_app_prepper:latest"
+    container "inpred/local_app_prepper:1.0.0"
 
     input:
     tuple val(id), path(runfolder), val(sample_list)
@@ -25,7 +25,7 @@ process LOCAL_APP_PREPPER {
 
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":
-        local_app_prepper: latest
+        local_app_prepper: 1.0.0
         python: \$(python --version | sed 's/Python //g')
     END_VERSIONS
     """
@@ -33,6 +33,7 @@ process LOCAL_APP_PREPPER {
     stub:
     """
     touch demultiplex.json gather.json tso500_IPH0001-D01-T01-A1.json tso500_IPH0001-D01-N01-A1.json
+
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":
         local_app_prepper: stub
