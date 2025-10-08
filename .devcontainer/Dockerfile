@@ -17,7 +17,7 @@ RUN apt-get update \
     && apt-get install -y --no-install-recommends \
         fish=3.3.1+ds-3 \
         fuse-overlayfs=1.7.1-1 \
-        openssh-server=1:8.9p1-3ubuntu0.11 \
+        openssh-server=1:8.9p1-3ubuntu0.13 \
         silversearcher-ag=2.2.0+git20200805-1 \
     && echo "LC_ALL=en_US.UTF-8" > /etc/default/locale \
     && locale-gen en_US.UTF-8 \
