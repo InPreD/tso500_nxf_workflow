@@ -25,8 +25,8 @@ RUN apt-get update \
     && rm -Rf /usr/share/doc && rm -Rf /usr/share/man \
     && rm -rf /var/lib/apt/lists/*
 # convert gitpod to local user
-RUN groupmod -n ${USERNAME} -g ${USER_GID} gitpod \
-    && usermod -md /home/${USERNAME} -l ${USERNAME} -u ${USER_UID} -s /usr/bin/fish -aG docker gitpod \
+RUN groupmod -n ${USERNAME} -g ${USER_GID:-1000} gitpod \
+    && usermod -md /home/${USERNAME} -l ${USERNAME} -u ${USER_UID:-1000} -s /usr/bin/fish -aG docker gitpod \
     && echo ${USERNAME} ALL=\(root\) NOPASSWD:ALL > /etc/sudoers.d/${USERNAME} \
     && chmod 0440 /etc/sudoers.d/${USERNAME} \
     && find / -uid 33333 -not -path "/proc/*" -exec chown ${USERNAME}:${USERNAME} {} +
