@@ -1,4 +1,17 @@
 .nextflow*
+work/
+data/
+results/
+.DS_Store
+testing/
+testing*
+*.pyc
+null/
+log/
+reports/
+testme.sh
+.nf-test*
+.vscode
 nohup.out
 null
 test_stub
