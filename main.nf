@@ -6,8 +6,8 @@
 */
 
 include { MAIN                    } from './workflows/main'
-include { PIPELINE_INITIALISATION } from './subworkflows/local/utils_nfcore_full_pipeline'
-include { PIPELINE_COMPLETION     } from './subworkflows/local/utils_nfcore_full_pipeline'
+include { PIPELINE_INITIALISATION } from './subworkflows/local/utils_nfcore_tso500_pipeline'
+include { PIPELINE_COMPLETION     } from './subworkflows/local/utils_nfcore_tso500_pipeline'
 
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
