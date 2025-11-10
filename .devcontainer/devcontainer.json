@@ -1,5 +1,5 @@
 {
-    "name": "nextflow",
+    "name": "nfcore",
     "build": {
         "dockerfile": "Dockerfile",
         "args": {
