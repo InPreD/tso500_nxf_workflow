@@ -1,4 +1,4 @@
-process LOCAL_APP {
+process TSO500_WORKFLOW {
     tag "$id"
     label 'process_medium'
 
@@ -46,6 +46,7 @@ process LOCAL_APP {
     output = 'localapp_' + id
     """
     mkdir $output
+
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":
         cromwell: stub
@@ -55,7 +56,7 @@ process LOCAL_APP {
     """
 }
 
-process GATHER {
+process GATHER_RESULTS_WORKFLOW {
     tag "$id"
     label 'process_medium'
 
@@ -101,6 +102,7 @@ process GATHER {
     """
     touch inputs.json
     mkdir cromwell-executions cromwell-workflow-logs Results
+
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":
         cromwell: stub
