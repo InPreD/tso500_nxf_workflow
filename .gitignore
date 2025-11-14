@@ -1,4 +1,15 @@
+*.pyc
+.DS_Store
 .nextflow*
-null
+.nf-test*
+.vscode
+data/
+log/
+nohup.out
+null/
+reports/
+results/
 test_stub
-work
+testing/
+testme.sh
+work/

@@ -1,34 +1,17 @@
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    IMPORT PLUGINS
+    IMPORT MODULES / SUBWORKFLOWS / FUNCTIONS
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 */
 
-include { fromSamplesheet } from 'plugin/nf-validation'
-
-/*
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    VALIDATE INPUTS
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-*/
-
-def summary_params = NfcoreSchema.paramsSummaryMap(workflow, params)
-
-// Check mandatory parameters and put into channels
-ch_input = Channel.fromSamplesheet("input")
-ch_tso500_resource_folder = file(params.tso500_resource_folder, checkIfExists: true)
-
-/*
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    IMPORT MODULES/SUBWORKFLOWS
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-*/
-
-include { CUSTOM_DUMPSOFTWAREVERSIONS        } from '../modules/nf-core/custom/dumpsoftwareversions/main'
-include { GATHER                             } from '../modules/local/local_app'
-include { LOCAL_APP as LOCAL_APP_DEMULTIPLEX } from '../modules/local/local_app'
-include { LOCAL_APP as LOCAL_APP_TSO500      } from '../modules/local/local_app'
-include { LOCAL_APP_PREPPER                  } from '../modules/local/local_app_prepper'
+include { GATHER                             } from '../modules/local/local_app/local_app'
+include { LOCAL_APP as LOCAL_APP_DEMULTIPLEX } from '../modules/local/local_app/local_app'
+include { LOCAL_APP as LOCAL_APP_TSO500      } from '../modules/local/local_app/local_app'
+include { LOCAL_APP_PREPPER                  } from '../modules/local/local_app_prepper/local_app_prepper'
+include { paramsSummaryMap                   } from 'plugin/nf-schema'
+include { samplesheetToList                  } from 'plugin/nf-schema'
+include { softwareVersionsToYAML             } from '../subworkflows/nf-core/utils_nfcore_pipeline'
+include { validateParameters                 } from 'plugin/nf-schema'
 
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -38,16 +21,21 @@ include { LOCAL_APP_PREPPER                  } from '../modules/local/local_app_
 
 workflow MAIN {
 
+    take:
+    samplesheet
+
+    main:
+
     // empty channel to store all software versions
     versions = Channel.empty()
 
     // channel holding information about run id, path to the run folder and a list of sample ids
-    local_app_prepper_input = ch_input
+    local_app_prepper_input = samplesheet
         .map{ it -> return [ it[6], it[7], it[1] ] }
         .groupTuple( by: [ 0, 1 ] )
 
     // channel holding information about run id, path to run folder and samplesheet
-    run_folders = ch_input
+    run_folders = samplesheet
         .map{ it -> return [ it[6], it[7], it[8], [] ] }
         .unique()
 
@@ -55,7 +43,7 @@ workflow MAIN {
     LOCAL_APP_PREPPER (
         local_app_prepper_input
     )
-    versions = versions.mix(LOCAL_APP_PREPPER.out.versions)
+    versions = versions.mix(LOCAL_APP_PREPPER.out.versions.first())
 
     // attach the json to the correct run folder information
     local_app_demultiplex_input = run_folders.join(LOCAL_APP_PREPPER.out.demultiplex)
@@ -63,7 +51,7 @@ workflow MAIN {
     // MODULE: Run LocalApp demultiplex workflow
     LOCAL_APP_DEMULTIPLEX (
         local_app_demultiplex_input,
-        ch_tso500_resource_folder
+        file(params.tso500_resource_folder)
     )
     versions = versions.mix(LOCAL_APP_DEMULTIPLEX.out.versions.first())
 
@@ -76,7 +64,7 @@ workflow MAIN {
     // MODULE: Run LocalApp TSO500 workflow
     LOCAL_APP_TSO500 (
         local_app_tso500_input,
-        ch_tso500_resource_folder
+        file(params.tso500_resource_folder)
     )
     versions = versions.mix(LOCAL_APP_TSO500.out.versions.first())
 
@@ -95,31 +83,23 @@ workflow MAIN {
     // MODULE: Run LocalApp Gather workflow
     GATHER (
         gather_input,
-        ch_tso500_resource_folder
+        file(params.tso500_resource_folder)
     )
     versions = versions.mix(GATHER.out.versions.first())
 
-    CUSTOM_DUMPSOFTWAREVERSIONS (
-        versions.unique().collectFile(name: 'collated_versions.yml')
-    )
+    // collate and save software versions
+    softwareVersionsToYAML(versions)
+        .collectFile(
+            storeDir: "${params.outdir}/pipeline_info",
+            name:  'software_versions.yml',
+            sort: true,
+            newLine: true
+        ).set { ch_collated_versions }
+
+    emit:
+    versions = versions
 
 }
-
-/*
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    SUMMARY
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-*/
-
-workflow.onComplete {
-    NfcoreTemplate.summary(workflow, params, log)
-}
-
-/*
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    FUNCTIONS FOR CHANNEL MANIPULATION
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-*/
 
 def get_sample_id(it) {
     def path_str = it.toString()

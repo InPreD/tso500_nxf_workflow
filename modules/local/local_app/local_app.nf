@@ -45,8 +45,13 @@ process LOCAL_APP {
     stub:
     output = 'localapp_' + id
     """
-    touch versions.yml
     mkdir $output
+    cat <<-END_VERSIONS > versions.yml
+    "${task.process}":
+        cromwell: stub
+        java: stub
+        tso500: stub
+    END_VERSIONS
     """
 }
 
@@ -94,7 +99,13 @@ process GATHER {
 
     stub:
     """
-    touch inputs.json versions.yml
+    touch inputs.json
     mkdir cromwell-executions cromwell-workflow-logs Results
+    cat <<-END_VERSIONS > versions.yml
+    "${task.process}":
+        cromwell: stub
+        java: stub
+        tso500: stub
+    END_VERSIONS
     """
 }

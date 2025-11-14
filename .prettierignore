@@ -1,1 +1,14 @@
+*.pyc
+.DS_Store
+.nextflow*
+.nf-test/
+adaptivecard.json
 bin/
+data/
+email_template.html
+results/
+ro-crate-metadata.json
+slackreport.json
+testing*
+testing/
+work/

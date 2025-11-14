@@ -1,1 +1,93 @@
 repository_type: pipeline
+
+nf_core_version: 3.2.0
+
+lint:
+  files_exist:
+    - .gitattributes
+    - .github/.dockstore.yml
+    - .github/CONTRIBUTING.md
+    - .github/ISSUE_TEMPLATE/bug_report.yml
+    - .github/ISSUE_TEMPLATE/config.yml
+    - .github/ISSUE_TEMPLATE/feature_request.yml
+    - .github/PULL_REQUEST_TEMPLATE.md
+    - .github/workflows/awsfulltest.yml
+    - .github/workflows/awstest.yml
+    - .github/workflows/branch.yml
+    - .github/workflows/ci.yml
+    - .github/workflows/linting.yml
+    - .github/workflows/linting_comment.yml
+    - CHANGELOG.md
+    - CITATIONS.md
+    - CODE_OF_CONDUCT.md
+    - LICENSE
+    - assets/adaptivecard.json
+    - assets/email_template.html
+    - assets/email_template.txt
+    - assets/multiqc_config.yml
+    - assets/nf-core-tso500_nxf_workflow_logo_light.png
+    - assets/sendmail_template.txt
+    - conf/igenomes.config
+    - conf/igenomes_ignored.config
+    - conf/test.config
+    - conf/test_full.config
+    - docs/README.md
+    - docs/images/nf-core-tso500_nxf_workflow_logo_dark.png
+    - docs/images/nf-core-tso500_nxf_workflow_logo_light.png
+    - docs/output.md
+    - docs/usage.md
+    - ro-crate-metadata.json
+  files_unchanged:
+    - .github/.dockstore.yml
+    - .github/CONTRIBUTING.md
+    - .github/ISSUE_TEMPLATE/bug_report.yml
+    - .github/ISSUE_TEMPLATE/config.yml
+    - .github/ISSUE_TEMPLATE/feature_request.yml
+    - .github/PULL_REQUEST_TEMPLATE.md
+    - .github/workflows/branch.yml
+    - .github/workflows/linting.yml
+    - .github/workflows/linting_comment.yml
+    - .prettierignore
+    - CODE_OF_CONDUCT.md
+    - LICENSE
+    - assets/email_template.txt
+    - assets/nf-core-tso500_nxf_workflow_logo_light.png
+    - assets/sendmail_template.txt
+    - docs/README.md
+    - docs/images/nf-core-tso500_nxf_workflow_logo_dark.png
+    - docs/images/nf-core-tso500_nxf_workflow_logo_light.png
+  multiqc_config: false
+  nextflow_config: false
+  pipeline_name_conventions: false
+  readme:
+    - nextflow_badge
+
+template:
+  org: InPreD
+  name: tso500_nxf_workflow
+  description: A pipeline for analysing TSO500 data
+  author: marrip
+  version: 1.0.0
+  force: true
+  outdir: .
+  skip_features:
+    - adaptivecard
+    - changelog
+    - ci
+    - citations
+    - codespaces
+    - documentation
+    - email
+    - fastqc
+    - github
+    - github_badges
+    - gitpod
+    - igenomes
+    - license
+    - multiqc
+    - rocrate
+    - seqera_platform
+    - slackreport
+    - test_config
+    - vscode
+  is_nfcore: false
