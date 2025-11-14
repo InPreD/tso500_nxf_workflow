@@ -35,7 +35,7 @@
             },
             "tumor_content": {
                 "type": "integer",
-                "errorMessage": "Tumor site should be number id or NA if sample is not tumor material",
+                "errorMessage": "Tumor content should be number id or NA if sample is not tumor material",
                 "minimum": 0,
                 "maximum": 100
             },
@@ -57,7 +57,8 @@
             },
             "barcode": {
                 "type": "string",
-                "errorMessage": "Run id must be provided and cannot contain spaces"
+                "pattern": " ^UDP\\d{4}",
+                "errorMessage": "Barcode must be provided and cannot contain spaces"
             }
         },
         "required": [
