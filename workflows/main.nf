@@ -4,7 +4,6 @@
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 */
 
-<<<<<<< HEAD
 include { GATHER_RESULTS_WORKFLOW                            } from '../modules/local/acadia_500_wdl_workflow/main'
 include { TSO500_WORKFLOW as TSO500_WORKFLOW_DEMULTIPLEX     } from '../modules/local/acadia_500_wdl_workflow/main'
 include { TSO500_WORKFLOW                                    } from '../modules/local/acadia_500_wdl_workflow/main'
@@ -15,18 +14,6 @@ include { softwareVersionsToYAML                             } from '../subworkf
 include { paramsSummaryMap                                   } from 'plugin/nf-schema'
 include { samplesheetToList                                  } from 'plugin/nf-schema'
 include { validateParameters                                 } from 'plugin/nf-schema'
-=======
-include { GATHER                                    } from '../modules/local/local_app/local_app'
-include { LOCAL_APP as LOCAL_APP_DEMULTIPLEX        } from '../modules/local/local_app/local_app'
-include { LOCAL_APP as LOCAL_APP_TSO500             } from '../modules/local/local_app/local_app'
-include { LOCAL_APP_PREPPER                         } from '../modules/local/local_app_prepper/local_app_prepper'
-include { paramsSummaryMap                          } from 'plugin/nf-schema'
-include { samplesheetToList                         } from 'plugin/nf-schema'
-include { softwareVersionsToYAML                    } from '../subworkflows/nf-core/utils_nfcore_pipeline'
-include { validateParameters                        } from 'plugin/nf-schema'
-include { METRICS_PLOTTING as ALL_METRICS_PLOTTING  } from '../modules/local/metrics/metrics.nf'
-include { METRICS_PLOTTING as LAST_N_METRICS_PLOTTING } from '../modules/local/metrics/metrics.nf'
->>>>>>> 24c694f (Update main.nf by changing header file)
 
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
