@@ -57,7 +57,7 @@
             },
             "barcode": {
                 "type": "string",
-                "pattern": " ^UDP\\d{4}",
+                "pattern": "^UDP\\d{4}",
                 "errorMessage": "Barcode must be provided and cannot contain spaces"
             }
         },
